@@ -1,13 +1,10 @@
-# Sample Hardhat Project
+# Nouncillors Project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Nouncillors is an Ethereum-based smart contract collection developed using Solidity. It's designed for creating and managing a unique NFT collection empowering The Nouncil at https://nouncil.wtf/ 
 
-Try running some of the following tasks:
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+## Project Status
+
+This project is currently in the development stage. Future updates will include enhanced security features and an expanded test suite.
+
+Contributions and suggestions are welcome!
