@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-/// @title Interface for NouncillorsSeeder
+/// @title Interface for Inflator
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -15,18 +15,10 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.6;
 
-import './INouncillorsDescriptorMinimal.sol';
+import '../libs/Inflate.sol';
 
-interface INouncillorsSeeder {
-    struct Seed {
-        uint48 background;
-        uint48 body;
-        uint48 accessory;
-        uint48 head;
-        uint48 glasses;
-    }
-
-    function generateSeed(uint256 nouncillorId, INouncillorsDescriptorMinimal descriptor) external view returns (Seed memory);
+interface IInflator {
+    function puff(bytes memory source, uint256 destlen) external pure returns (Inflate.ErrorCode, bytes memory);
 }

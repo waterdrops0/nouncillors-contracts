@@ -15,7 +15,7 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -24,50 +24,31 @@ import "./interfaces/INouncillorsSeeder.sol";
 import './interfaces/INouncillorsToken.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-
-
-/// @dev Events
-event WhitelistUpdated(uint256 indexed templateId, string name, string description, string image);
-event NouncillorMinted(uint256 indexed tokenId, uint256 indexed templateId);
-event TransferabilityToggled(bool transfersEnabled);
-
-
-/// @dev Errors
-error NotWhitelisted();
-error AlreadyClaimed();
-error TransferDisabled();
-
-
 contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using MerkleProof for bytes32;
-    address public minter;
-    INounsDescriptorMinimal public descriptor;
-    INounsSeeder public seeder;
-    bool public isMinterLocked;
-    bool public isDescriptorLocked;
-    bool public isSeederLocked;
+    INouncillorsDescriptorMinimal public descriptor;
+    INouncillorsSeeder public seeder;
     mapping(uint256 => INouncillorsSeeder.Seed) public seeds;
     uint256 private _currentNouncillorId;
-    string private _contractURIHash = 'EjsnYhfWQdasdACASf';
+    mapping(address => bool) private hasMinted;
     bool private _transfersEnabled;
     bytes32 private merkleRoot;
+    string private _contractURIHash = 'EjsnYhfWQdasdACASf';
 
     function initialize(
         string memory name,
         string memory symbol,
-        INounsDescriptorMinimal _descriptor,
-        INounsSeeder _seeder
+        INouncillorsDescriptorMinimal _descriptor,
+        INouncillorsSeeder _seeder
     ) public initializer {
         __ERC721_init(name, symbol);
         __ERC721Enumerable_init();
-        __Ownable_init();
+        __Ownable_init(msg.sender);
         _transfersEnabled = false;
-        minter = _minter;
         descriptor = _descriptor;
         seeder = _seeder;
     }
 
-    
     function contractURI() public view returns (string memory) {
         return string(abi.encodePacked('ipfs://', _contractURIHash));
     }
@@ -85,8 +66,20 @@ contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
         return super.supportsInterface(interfaceId);
     }
 
+    // Events...
 
-    //Transferability...
+    event NouncillorMinted(uint256 indexed tokenId, address indexed mintedBy);
+    event WhitelistUpdated(bytes32 indexed newMerkleRoot);
+    event TransferabilityToggled(bool transfersEnabled);
+
+    // Errors...
+
+    error NotWhitelisted();
+    error AlreadyClaimed();
+    error TransferDisabled();
+
+
+    // Transferability...
 
     function toggleTransferability() public onlyOwner {
     _transfersEnabled = !_transfersEnabled;
@@ -94,27 +87,27 @@ contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     }
 
     function transferFrom(address from, address to, uint256 tokenId) public override {
-    if (!transfersEnabled) revert TransferDisabled();
+    if (!_transfersEnabled) revert TransferDisabled();
     super.transferFrom(from, to, tokenId);
     }
 
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public override {
-    if (!transfersEnabled) revert TransferDisabled();
+    if (!_transfersEnabled) revert TransferDisabled();
     super.safeTransferFrom(from, to, tokenId, _data);
     }
 
     function safeTransferFrom(address from, address to, uint256 tokenId) public override {
-    if (!transfersEnabled) revert TransferDisabled();
+    if (!_transfersEnabled) revert TransferDisabled();
     super.safeTransferFrom(from, to, tokenId);
     }
 
     function approve(address to, uint256 tokenId) public override {
-    if (!transfersEnabled) revert TransferDisabled();
+    if (!_transfersEnabled) revert TransferDisabled();
     super.approve(to, tokenId);
     }
 
     function setApprovalForAll(address operator, bool _approved) public override {
-    if (!transfersEnabled) revert TransferDisabled();
+    if (!_transfersEnabled) revert TransferDisabled();
     super.setApprovalForAll(operator, _approved);
     }
 
@@ -122,22 +115,33 @@ contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     // Whitelisting...
 
     function setMerkleRoot(bytes32 _newMerkleRoot) public onlyOwner {
-    merkleRoot = _newMerkleRoot;
+        merkleRoot = _newMerkleRoot;
+        emit WhitelistUpdated(_newMerkleRoot);
     }
 
     function isWhitelisted(address _address, bytes32[] calldata _merkleProof) public view returns (bool) {
-    bytes32 leaf = keccak256(abi.encodePacked(_address));
-    return MerkleProof.verify(_merkleProof, merkleRoot, leaf);
+        bytes32 leaf = keccak256(abi.encodePacked(_address));
+        return MerkleProof.verify(_merkleProof, merkleRoot, leaf);
     }
 
 
     // Minting...
 
     function mint(bytes32[] calldata _merkleProof) public returns (uint256) {
+        if (hasMinted[msg.sender]) {
+            revert AlreadyClaimed();
+        }
+
         if (!isWhitelisted(msg.sender, _merkleProof)) {
             revert NotWhitelisted();
         }
-        return _mintTo(minter, _currentNouncillorId++);
+
+        hasMinted[msg.sender] = true;
+        uint256 newTokenId = _mintTo(msg.sender, _currentNouncillorId++);
+        emit NouncillorMinted(newTokenId, msg.sender);
+        return newTokenId;
+
+    
     }
 
     function _mintTo(address to, uint256 nouncillorId) internal returns (uint256) {

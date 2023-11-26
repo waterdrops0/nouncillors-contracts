@@ -15,16 +15,15 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import './interfaces/INouncillorsSeeder.sol';
 import './interfaces/INouncillorsDescriptorMinimal.sol';
 
-contract NounsSeeder is INouncillorsSeeder {
-    /**
-     * @notice Generate a pseudo-random Nouncillor seed using the previous blockhash and nouncillor ID.
-     */
-    // prettier-ignore
+contract NouncillorsSeeder is INouncillorsSeeder {
+
+    //Generate a pseudo-random Nouncillor seed using the previous blockhash and nouncillor ID.
+ 
     function generateSeed(uint256 nouncillorId, INouncillorsDescriptorMinimal descriptor) external view override returns (Seed memory) {
         uint256 pseudorandomness = uint256(
             keccak256(abi.encodePacked(blockhash(block.number - 1), nouncillorId))

@@ -1,6 +1,15 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("./task/deploy-and-configure");
+require("./tasks/deploy");
+require('./tasks/populate-descriptor');
+require('dotenv').config()
 
-/** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
-  solidity: "0.8.19",
+  solidity: "0.8.22", 
+  networks: {
+    sepolia: {
+      url: process.env.ALCHEMY_API_URL, 
+      accounts: [process.env.PRIVATE_KEY], 
+    },
+  },
 };
