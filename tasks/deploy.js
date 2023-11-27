@@ -8,9 +8,9 @@ promptjs.message = '> ';
 promptjs.delimiter = '';
 
 // This offset is used to predict the address of the NouncillorsArt contract
-const NOUNCILLORS_ART_NONCE_OFFSET = 4;
+const NOUNCILLORS_ART_NONCE_OFFSET = 5;
 
-task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescriptor, NouncillorsArt, NouncillorsSeeder, and NouncillorsToken')
+task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescriptor, NouncillorsArt, NouncillorsSeeder, ERC2771ForwarderUpgradeable, and NouncillorsToken')
   .addFlag('autoDeploy', 'Deploy all contracts without user interaction')
   .setAction(async (args, hre) => {
     const [deployer] = await hre.ethers.getSigners();
@@ -27,6 +27,7 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
       SVGRenderer: {},
       Inflator: {},
       NFTDescriptor: {},
+      ERC2771ForwarderUpgradeable: {},
       NouncillorsDescriptor: {
         args: [expectedNouncillorsArtAddress, () => deployment.SVGRenderer.address],
       },
@@ -38,6 +39,7 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
         args: [
           'NouncillorsToken', // Token name
           'NCL', // Token symbol
+          () => deployment.ERC2771ForwarderUpgradeable.address,
           () => deployment.NouncillorsDescriptor.address,
           () => deployment.NouncillorsSeeder.address,
         ],

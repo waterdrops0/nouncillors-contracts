@@ -23,8 +23,10 @@ import "./interfaces/INouncillorsDescriptorMinimal.sol";
 import "./interfaces/INouncillorsSeeder.sol";
 import './interfaces/INouncillorsToken.sol';
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ForwarderUpgradeable.sol";
 
-contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
+contract NouncillorsToken is ERC2771ContextUpgradeable, ERC721EnumerableUpgradeable, OwnableUpgradeable {
     using MerkleProof for bytes32;
     INouncillorsDescriptorMinimal public descriptor;
     INouncillorsSeeder public seeder;
@@ -38,11 +40,13 @@ contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     function initialize(
         string memory name,
         string memory symbol,
+        ERC2771ForwarderUpgradeable forwarder,
         INouncillorsDescriptorMinimal _descriptor,
         INouncillorsSeeder _seeder
     ) public initializer {
         __ERC721_init(name, symbol);
         __ERC721Enumerable_init();
+        __ERC2771Context_init(address(forwarder));
         __Ownable_init(msg.sender);
         _transfersEnabled = false;
         descriptor = _descriptor;
@@ -128,17 +132,18 @@ contract NouncillorsToken is ERC721EnumerableUpgradeable, OwnableUpgradeable {
     // Minting...
 
     function mint(bytes32[] calldata _merkleProof) public returns (uint256) {
-        if (hasMinted[msg.sender]) {
+        address sender = _msg.sender();
+        if (hasMinted[sender]) {
             revert AlreadyClaimed();
         }
 
-        if (!isWhitelisted(msg.sender, _merkleProof)) {
+        if (!isWhitelisted(sender, _merkleProof)) {
             revert NotWhitelisted();
         }
 
-        hasMinted[msg.sender] = true;
-        uint256 newTokenId = _mintTo(msg.sender, _currentNouncillorId++);
-        emit NouncillorMinted(newTokenId, msg.sender);
+        hasMinted[sender] = true;
+        uint256 newTokenId = _mintTo(sender, _currentNouncillorId++);
+        emit NouncillorMinted(newTokenId, sender);
         return newTokenId;
 
     
