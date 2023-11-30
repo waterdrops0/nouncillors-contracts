@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity ^0.8.20;
 
 /// @notice Based on https://github.com/madler/zlib/blob/master/contrib/puff
 /// @dev Modified the original code for gas optimizations

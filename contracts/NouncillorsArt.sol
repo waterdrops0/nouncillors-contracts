@@ -15,7 +15,7 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import './interfaces/INouncillorsArt.sol';
 import './libs/SSTORE2.sol';
@@ -437,7 +437,7 @@ contract NouncillorsArt is INouncillorsArt {
     }
 
     function imageByIndex(INouncillorsArt.Trait storage trait, uint256 index) internal view returns (bytes memory) {
-        (INouncillorsArt.NounArtStoragePage storage page, uint256 indexInPage) = getPage(trait.storagePages, index);
+        (INouncillorsArt.NouncillorArtStoragePage storage page, uint256 indexInPage) = getPage(trait.storagePages, index);
         bytes[] memory decompressedImages = decompressAndDecode(page);
         return decompressedImages[indexInPage];
     }

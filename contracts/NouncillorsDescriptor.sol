@@ -15,7 +15,7 @@
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
  *********************************/
 
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.20;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
@@ -55,7 +55,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
         _;
     }
 
-    constructor(INouncillorsArt _art, ISVGRenderer _renderer) {
+    constructor(address initialOwner, INouncillorsArt _art, ISVGRenderer _renderer) Ownable(initialOwner) {
         art = _art;
         renderer = _renderer;
     }
@@ -435,7 +435,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     /**
      * @notice Given a seed, construct a base64 encoded SVG image.
      */
-    function generateSVGImage(INounsSeeder.Seed memory seed) external view override returns (string memory) {
+    function generateSVGImage(INouncillorsSeeder.Seed memory seed) external view override returns (string memory) {
         ISVGRenderer.SVGParams memory params = ISVGRenderer.SVGParams({
             parts: getPartsForSeed(seed),
             background: art.backgrounds(seed.background)
