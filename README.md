@@ -1,6 +1,6 @@
 # Nouncillors Project
 
-Nouncillors is an Ethereum-based smart contract collection developed using Solidity. It's designed for creating and managing a unique NFT collection empowering The Nouncil at https://nouncil.wtf/ 
+Nouncillors is an Ethereum-based smart contract collection developed using Solidity. It's designed for creating and managing a unique NFT collection empowering The Nouncil (https://nouncil.wtf/) 
 
 
 ## Project Status
