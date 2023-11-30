@@ -1,142 +1,79 @@
-const { task } = require('hardhat/config');
-const ethers = require('ethers');
-const promptjs = require('prompt');
+const { task, ethers, upgrades } = require("hardhat/config");
 
-// Configuration for the prompt used in interactive mode
-promptjs.colors = false;
-promptjs.message = '> ';
-promptjs.delimiter = '';
-
-// This offset is used to predict the address of the NouncillorsArt contract
-const NOUNCILLORS_ART_NONCE_OFFSET = 5;
-
-task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescriptor, NouncillorsArt, NouncillorsSeeder, ERC2771ForwarderUpgradeable, and NouncillorsToken')
-  .addFlag('autoDeploy', 'Deploy all contracts without user interaction')
-  .setAction(async (args, hre) => {
+task("deploy", "Deploys the Nouncillors contracts")
+  .setAction(async () => {
     const [deployer] = await hre.ethers.getSigners();
+    console.log("Deploying contracts with the account:", deployer.address);
 
-    // Predicting the address of the NouncillorsArt contract
-    const nonce = await deployer.getTransactionCount();
-    const expectedNouncillorsArtAddress = hre.ethers.utils.getContractAddress({
+    const tokenName = "NouncillorsToken";
+    const tokenSymbol = "NCT";
+
+    // Calculate the expected address of NouncillorsArt
+    const nonce = await deployer.provider.getTransactionCount(deployer.address); 
+    const expectedNouncillorsArtAddress = hre.ethers.getCreateAddress({
       from: deployer.address,
-      nonce: nonce + NOUNCILLORS_ART_NONCE_OFFSET,
+      nonce: nonce + 5
     });
+    console.log("The expected Art address is: ", expectedNouncillorsArtAddress);
 
-    const deployment = {};
-    const contracts = {
-      SVGRenderer: {},
-      Inflator: {},
-      NFTDescriptor: {},
-      ERC2771ForwarderUpgradeable: {},
-      NouncillorsDescriptor: {
-        args: [expectedNouncillorsArtAddress, () => deployment.SVGRenderer.address],
-      },
-      NouncillorsArt: {
-        args: [() => deployment.NouncillorsDescriptor.address, () => deployment.Inflator.address],
-      },
-      NouncillorsSeeder: {},
-      NouncillorsToken: {
-        args: [
-          'NouncillorsToken', // Token name
-          'NCL', // Token symbol
-          () => deployment.ERC2771ForwarderUpgradeable.address,
-          () => deployment.NouncillorsDescriptor.address,
-          () => deployment.NouncillorsSeeder.address,
-        ],
-      },
-    };
 
-    // Looping through each contract for deployment
-    for (const [name, contract] of Object.entries(contracts)) {
-      let gasPrice = await hre.ethers.provider.getGasPrice();
+    // Deploy SVGRenderer
+    const SVGRenderer = await hre.ethers.getContractFactory("SVGRenderer");
+    const svgRenderer = await SVGRenderer.deploy();
+    await svgRenderer.waitForDeployment();
+    console.log("SVGRenderer deployed to: ", svgRenderer.target)
 
-      // If not auto-deploying, interactively set the gas price
-      if (!args.autoDeploy) {
-        const gasInGwei = Math.round(Number(hre.ethers.utils.formatUnits(gasPrice, 'gwei')));
-        promptjs.start();
-        const result = await promptjs.get([
-          {
-            properties: {
-              gasPrice: {
-                type: 'integer',
-                required: true,
-                description: 'Enter a gas price (gwei)',
-                default: gasInGwei,
-              },
-            },
-          },
-        ]);
-        gasPrice = hre.ethers.utils.parseUnits(result.gasPrice.toString(), 'gwei');
+    // Deploy Inflator
+    const Inflator = await hre.ethers.getContractFactory("Inflator");
+    const inflator = await Inflator.deploy();
+    await inflator.waitForDeployment();
+    console.log("Inflator deployed to:", await inflator.getAddress());
+
+    // Deploy NFTDescriptor
+    const NFTDescriptor = await hre.ethers.getContractFactory("NFTDescriptor");
+    const nftDescriptor = await NFTDescriptor.deploy();
+    await nftDescriptor.waitForDeployment();
+    console.log("NFTDescriptor deployed to:", await nftDescriptor.getAddress());
+    
+    // ERC2771ForwarderUpgradeable
+    const ERC2771ForwarderUpgradeable = await hre.ethers.getContractFactory("ERC2771ForwarderUpgradeable");
+    const erc2771ForwarderUpgradeable = await ERC2771ForwarderUpgradeable.deploy();
+    await erc2771ForwarderUpgradeable.waitForDeployment();
+    console.log("Forwarder deployed to:", await erc2771ForwarderUpgradeable.getAddress());
+
+    // Deploy NouncillorsDescriptor with SVGRenderer's address, NFTDescriptor's address, and expected NouncillorsArt address
+    const NouncillorsDescriptor = await hre.ethers.getContractFactory("NouncillorsDescriptor", {
+      libraries: {
+        NFTDescriptor: nftDescriptor.target
       }
+    });
+    const nouncillorsDescriptor = await NouncillorsDescriptor.deploy(svgRenderer.target, expectedNouncillorsArtAddress);
+    await nouncillorsDescriptor.waitForDeployment();
+    console.log("NouncillorsDescriptor deployed to:", await nouncillorsDescriptor.getAddress());
 
-      // Creating the contract factory
-      const factory = await hre.ethers.getContractFactory(name);
+    // Deploy NouncillorsArt with NouncillorsDescriptor and Inflator's addresses
+    const NouncillorsArt = await hre.ethers.getContractFactory("NouncillorsArt");
+    const nouncillorsArt = await NouncillorsArt.deploy(nouncillorsDescriptor.target, inflator.target);
+    await nouncillorsArt.waitForDeployment();
+    console.log("NouncillorsArt deployed to:", await nouncillorsArt.getAddress());
 
-      // Estimating gas for deployment
-      const deploymentGas = await factory.signer.estimateGas(
-        factory.getDeployTransaction(
-          ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
-          {
-            gasPrice,
-          },
-        ),
-      );
-      const deploymentCost = deploymentGas.mul(gasPrice);
+    // Deploy NouncillorsSeeder
+    const NouncillorsSeeder = await hre.ethers.getContractFactory("NouncillorsSeeder");
+    const nouncillorsSeeder = await NouncillorsSeeder.deploy();
+    await nouncillorsSeeder.waitForDeployment();
+    console.log("Seeder deployed to:", await nouncillorsSeeder.getAddress());
 
-      // Displaying the estimated cost
-      console.log(
-        `Estimated cost to deploy ${name}: ${hre.ethers.utils.formatUnits(
-          deploymentCost,
-          'ether',
-        )} ETH`,
-      );
+     // Deploy the NouncillorsToken implementation contract
+    const NouncillorsToken = await hre.ethers.getContractFactory("NouncillorsToken");
+    const nouncillorsTokenImplementation = await NouncillorsToken.deploy(erc2771ForwarderUpgradeable.target);
+    await nouncillorsTokenImplementation.waitForDeployment();
+    console.log("NouncillorsToken deployed to:", await nouncillorsTokenImplementation.getAddress());
 
-      // Interactive confirmation for deployment
-      if (!args.autoDeploy) {
-        const result = await promptjs.get([
-          {
-            properties: {
-              confirm: {
-                pattern: /^(DEPLOY|SKIP|EXIT)$/,
-                description:
-                  'Type "DEPLOY" to confirm, "SKIP" to skip this contract, or "EXIT" to exit.',
-              },
-            },
-          },
-        ]);
-        if (result.confirm === 'SKIP') {
-          console.log(`Skipping ${name} deployment...`);
-          continue;
-        }
-        if (result.confirm === 'EXIT') {
-          console.log('Exiting...');
-          return;
-        }
-      }
+    // Initialize NouncillorsToken
+    await nouncillorsTokenImplementation.initialize(tokenName, tokenSymbol, nouncillorsDescriptor.target, nouncillorsSeeder.target);
+    console.log("NouncillorsToken deployed to:", await nouncillorsTokenImplementation.getAddress(), "and initialized.");
 
-      // Deploying the contract
-      console.log(`Deploying ${name}...`);
-      const deployedContract = await factory.deploy(
-        ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
-        {
-          gasPrice,
-        },
-      );
+    console.log("Contracts deployed successfully!");
+});
 
-      // Awaiting deployment confirmation
-      await deployedContract.deployed();
-
-      // Storing deployment information
-      deployment[name] = {
-        name,
-        instance: deployedContract,
-        address: deployedContract.address,
-        constructorArguments: contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? [],
-      };
-
-      console.log(`${name} contract deployed to ${deployedContract.address}`);
-    }
-
-    // Returning all deployment information
-    return deployment;
-  });
+module.exports = {};
