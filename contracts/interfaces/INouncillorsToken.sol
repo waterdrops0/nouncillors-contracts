@@ -22,13 +22,7 @@ import './INouncillorsDescriptorMinimal.sol';
 import './INouncillorsSeeder.sol';
 
 interface INouncillorsToken is IERC721 {
-    event NouncillorCreated(uint256 indexed tokenId, INouncillorsSeeder.Seed seed);
-
-    event NoucillorBurned(uint256 indexed tokenId);
-
-    event MinterUpdated(address minter);
-
-    event MinterLocked();
+    event NouncillorMinted(uint256 indexed tokenId, INouncillorsSeeder.Seed seed, address indexed minter);
 
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
 
@@ -38,15 +32,25 @@ interface INouncillorsToken is IERC721 {
 
     event SeederLocked();
 
-    function mint() external returns (uint256);
+    event WhitelistUpdated(bytes32 indexed newMerkleRoot);
+    
+    event TransferabilityToggled(bool transfersEnabled);
 
-    function burn(uint256 tokenId) external;
+    error NotWhitelisted();
+
+    error AlreadyClaimed();
+
+    error TransferDisabled();
+
+    error NonexistentTokenQuery(uint256 tokenId);
+
+    error DescriptorLocked();
+
+    error SeederLocked();
+
+    function mint(bytes32[] calldata _merkleProof) external returns (uint256);
 
     function dataURI(uint256 tokenId) external returns (string memory);
-
-    function setMinter(address minter) external;
-
-    function lockMinter() external;
 
     function setDescriptor(INouncillorsDescriptorMinimal descriptor) external;
 

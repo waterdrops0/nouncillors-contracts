@@ -5,8 +5,8 @@ task("deploy", "Deploys the Nouncillors contracts")
     const [deployer] = await hre.ethers.getSigners();
     console.log("Deploying contracts with the account:", deployer.address);
 
-    const tokenName = "NouncillorsToken";
-    const tokenSymbol = "NCT";
+    const tokenName = "Nouncillors";
+    const tokenSymbol = "NOUNC";
 
     // Calculate the expected address of NouncillorsArt
     const nonce = await deployer.provider.getTransactionCount(deployer.address); 
@@ -47,7 +47,7 @@ task("deploy", "Deploys the Nouncillors contracts")
         NFTDescriptor: nftDescriptor.target
       }
     });
-    const nouncillorsDescriptor = await NouncillorsDescriptor.deploy(svgRenderer.target, expectedNouncillorsArtAddress);
+    const nouncillorsDescriptor = await NouncillorsDescriptor.deploy(deployer.address, expectedNouncillorsArtAddress, svgRenderer.target);
     await nouncillorsDescriptor.waitForDeployment();
     console.log("NouncillorsDescriptor deployed to:", await nouncillorsDescriptor.getAddress());
 

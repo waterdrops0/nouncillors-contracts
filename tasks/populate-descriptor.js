@@ -6,12 +6,12 @@ task('populate-descriptor', 'Populates the descriptor with color palettes and No
   .addOptionalParam(
     'nftDescriptor',
     'The `NFTDescriptor` contract address',
-    '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+    '0xdC8fE2E9EF837BF8ba82a70664bDb7B5389b2E7A',
   )
   .addOptionalParam(
     'nouncillorsDescriptor',
     'The `NouncillorsDescriptor` contract address',
-    '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
+    '0x9dcD86F841cC01e5E8779343F13A6dc05aB9870c',
   )
   .setAction(async ({ nftDescriptor, nouncillorsDescriptor }, hre) => {
     const options = { gasLimit: hre.network.name === 'hardhat' ? 30000000 : undefined };
@@ -25,6 +25,9 @@ task('populate-descriptor', 'Populates the descriptor with color palettes and No
 
     const { bgcolors, palette, images } = ImageData;
     const { bodies, accessories, heads, glasses } = images;
+
+    const bodyData = bodies.map(({ data }) => data);
+    console.log(bodyData);
 
     const bodiesPage = dataToDescriptorInput(bodies.map(({ data }) => data));
     const headsPage = dataToDescriptorInput(heads.map(({ data }) => data));

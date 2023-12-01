@@ -11,16 +11,19 @@ promptjs.delimiter = '';
 const NOUNCILLORS_ART_NONCE_OFFSET = 5;
 
 task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescriptor, NouncillorsArt, NouncillorsSeeder, ERC2771ForwarderUpgradeable, and NouncillorsToken')
-  .addFlag('autoDeploy', 'Deploy all contracts without user interaction')
+  .addParam('autodeploy', 'Deploy all contracts without user interaction', false, types.boolean, true)
   .setAction(async (args, hre) => {
     const [deployer] = await hre.ethers.getSigners();
 
     // Predicting the address of the NouncillorsArt contract
-    const nonce = await deployer.getTransactionCount();
-    const expectedNouncillorsArtAddress = hre.ethers.utils.getContractAddress({
+    const nonce = await deployer.provider.getTransactionCount(deployer.address);
+    console.log("The nonce is:", nonce);
+    console.log(deployer.address, "This is from address");
+    const expectedNouncillorsArtAddress = ethers.getCreateAddress({
       from: deployer.address,
       nonce: nonce + NOUNCILLORS_ART_NONCE_OFFSET,
     });
+    console.log(expectedNouncillorsArtAddress, "This is the address");
 
     const deployment = {};
     const contracts = {
@@ -30,6 +33,9 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
       ERC2771ForwarderUpgradeable: {},
       NouncillorsDescriptor: {
         args: [expectedNouncillorsArtAddress, () => deployment.SVGRenderer.address],
+        libraries: () => ({
+          NFTDescriptor: deployment.NFTDescriptor.address,
+        }),
       },
       NouncillorsArt: {
         args: [() => deployment.NouncillorsDescriptor.address, () => deployment.Inflator.address],
@@ -39,20 +45,23 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
         args: [
           'NouncillorsToken', // Token name
           'NCL', // Token symbol
-          () => deployment.ERC2771ForwarderUpgradeable.address,
           () => deployment.NouncillorsDescriptor.address,
           () => deployment.NouncillorsSeeder.address,
         ],
+        constructorArgs: [() => deployment.ERC2771ForwarderUpgradeable.address], // Constructor argument
       },
     };
 
     // Looping through each contract for deployment
     for (const [name, contract] of Object.entries(contracts)) {
-      let gasPrice = await hre.ethers.provider.getGasPrice();
-
+      const feeData = await hre.ethers.provider.getFeeData();
+      console.log("this is fee data", feeData);
+      let gasPrice = feeData.gasPrice;
+      let maxFeePerGas = feeData.maxFeePerGas;
+      console.log("This is the gas price: ", gasPrice);
       // If not auto-deploying, interactively set the gas price
-      if (!args.autoDeploy) {
-        const gasInGwei = Math.round(Number(hre.ethers.utils.formatUnits(gasPrice, 'gwei')));
+      if (!args.autodeploy) {
+        const gasInGwei = Math.round(Number(hre.ethers.formatUnits(gasPrice, 'gwei')));
         promptjs.start();
         const result = await promptjs.get([
           {
@@ -66,14 +75,14 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
             },
           },
         ]);
-        gasPrice = hre.ethers.utils.parseUnits(result.gasPrice.toString(), 'gwei');
+        gasPrice = hre.ethers.parseUnits(result.gasPrice.toString(), 'gwei');
       }
 
       // Creating the contract factory
       const factory = await hre.ethers.getContractFactory(name);
 
       // Estimating gas for deployment
-      const deploymentGas = await factory.signer.estimateGas(
+      const deploymentGas = await deployer.provider.estimateGas(
         factory.getDeployTransaction(
           ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
           {
@@ -81,18 +90,18 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
           },
         ),
       );
-      const deploymentCost = deploymentGas.mul(gasPrice);
-
+      const deploymentCost = deploymentGas * gasPrice;
+      
       // Displaying the estimated cost
-      console.log(
-        `Estimated cost to deploy ${name}: ${hre.ethers.utils.formatUnits(
+      /*console.log(
+        `Estimated cost to deploy ${name}: ${hre.ethers.formatUnits(
           deploymentCost,
           'ether',
         )} ETH`,
       );
-
+          */
       // Interactive confirmation for deployment
-      if (!args.autoDeploy) {
+      if (args.autodeploy) {
         const result = await promptjs.get([
           {
             properties: {
@@ -119,12 +128,12 @@ task('deploy', 'Deploys NFTDescriptor, SVGRenderer, Inflator, NouncillorsDescrip
       const deployedContract = await factory.deploy(
         ...(contract.args?.map(a => (typeof a === 'function' ? a() : a)) ?? []),
         {
-          gasPrice,
+          maxFeePerGas, // old gasPrice
         },
       );
 
       // Awaiting deployment confirmation
-      await deployedContract.deployed();
+      await deployedContract.waitForDeployment();
 
       // Storing deployment information
       deployment[name] = {
