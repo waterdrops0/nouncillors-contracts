@@ -1,6 +1,6 @@
 
-![logo_nounciln](https://github.com/curelycue/nouncillors-contracts/assets/22319741/af3d3035-4246-4471-9c8f-e86a0b46eff3)
 
+![logo_nouncilnn](https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6)
 
 # Nouncillors 
 
