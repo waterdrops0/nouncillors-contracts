@@ -17,16 +17,16 @@
 
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./interfaces/INouncillorsDescriptorMinimal.sol";
 import "./interfaces/INouncillorsSeeder.sol";
 import './interfaces/INouncillorsToken.sol';
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ContextUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/metatx/ERC2771ForwarderUpgradeable.sol";
 
-contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC721Upgradeable, OwnableUpgradeable {
+contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context {
     using MerkleProof for bytes32;
 
     // The descriptor contract that defines how Nouncillors NFTs should be displayed.
@@ -53,18 +53,18 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     // Flag to control whether transfers are enabled or not.
     bool private _transfersEnabled;
 
-    // Merkle root for verifying some aspect of the contract (e.g., whitelist).
+    // Merkle root for verifying the whitelist.
     bytes32 private merkleRoot;
 
     // URI hash part of the contract metadata.
-    string private _contractURIHash = 'EjsnYhfWQdasdACASf';
+    string private _contractURIHash;
 
    /**
     * @dev Ensures descriptor is unlocked; reverts if locked.
     */
     modifier whenDescriptorNotLocked() {
         if (isDescriptorLocked) {
-            revert DescriptorLocked();
+            revert DescriptorisLocked();
         }
         _;
     }
@@ -74,34 +74,39 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     */
     modifier whenSeederNotLocked() {
         if (isSeederLocked) {
-            revert SeederLocked();
+            revert SeederisLocked();
         }
         _;
     }
 
-    // Constructor for upgradeable contracts. Initializes the base ERC2771 context.
-    // @param forwarder The address of the trusted forwarder for meta-transactions.
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address forwarder)
-        ERC2771ContextUpgradeable(forwarder)
-    {}
-
-    // Initializes the contract. This function replaces the constructor for upgradeable contracts.
-    // @param name The name of the NFT collection.
-    // @param symbol The symbol of the NFT collection.
-    // @param _descriptor The address of the Nouncillors descriptor contract.
-    // @param _seeder The address of the Nouncillors seeder contract.
-    function initialize(
+   /**
+    * @dev Constructor for the NouncillorsToken contract.
+    * @param name The name of the NFT collection.
+    * @param symbol The symbol of the NFT collection.
+    * @param _descriptor The address of the Nouncillors descriptor contract.
+    * @param _seeder The address of the Nouncillors seeder contract.
+    * @param forwarder The address of the trusted forwarder for meta-transactions.
+    */
+    constructor(
         string memory name,
         string memory symbol,
-        INouncillorsDescriptorMinimal _descriptor,
-        INouncillorsSeeder _seeder
-    ) public initializer {
-        __ERC721_init(name, symbol);             // Initialize the ERC721 token with name and symbol.
-        __Ownable_init(msg.sender);              // Initialize the contract with the deployer as the owner.
-        _transfersEnabled = false;               // Initially, transfers are disabled.
-        descriptor = _descriptor;                // Set the descriptor contract.
-        seeder = _seeder;                        // Set the seeder contract.
+        address initialOwner,
+        ERC2771Forwarder forwarder,
+        INouncillorsSeeder _seeder,
+        INouncillorsDescriptorMinimal _descriptor
+       
+    ) 
+        ERC721(name, symbol) 
+        Ownable(initialOwner)
+        ERC2771Context(address(forwarder)) 
+    {
+        _transfersEnabled = false; // Initially, transfers are disabled.
+        seeder = _seeder; // Set the seeder contract.
+        descriptor = _descriptor; // Set the descriptor contract.
+        isSeederLocked = false; // Seeder is initially unlocked.
+        isDescriptorLocked = false; // Descriptor is initially unlocked.
+        _currentNouncillorId = 0; // Start token ID counter at 0.
+        _contractURIHash = 'EjsnYhfWQdasdACASf'; // Set initial URI hash.
     }
 
    /**
@@ -129,9 +134,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     * @return The token URI of the given token ID.
     */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        if (!_exists(tokenId)) {
-            revert NonexistentTokenQuery(tokenId);
-        }
+        _requireOwned(tokenId);
         return descriptor.tokenURI(tokenId, seeds[tokenId]);
     }
 
@@ -142,11 +145,10 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     * @return The data URI of the given token ID.
     */
     function dataURI(uint256 tokenId) public view override returns (string memory) {
-        if (!_exists(tokenId)) {
-            revert NonexistentTokenQuery(tokenId);
-        }
+        _requireOwned(tokenId);
         return descriptor.dataURI(tokenId, seeds[tokenId]);
     }
+
 
    /**
     * @notice Mints a new token if the sender is whitelisted and hasn't minted before.
@@ -205,25 +207,25 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     }
 
     // Transfer a token (reverts if transfers are disabled).
-    function transferFrom(address from, address to, uint256 tokenId) public override (ERC721Upgradeable, IERC721) {
+    function transferFrom(address from, address to, uint256 tokenId) public override (ERC721, IERC721) {
         if (!_transfersEnabled) revert TransferDisabled();
         super.transferFrom(from, to, tokenId);
     }
 
     // Safely transfer a token (reverts if transfers are disabled).
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public override (ERC721Upgradeable, IERC721) {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public override (ERC721, IERC721) {
         if (!_transfersEnabled) revert TransferDisabled();
         super.safeTransferFrom(from, to, tokenId, _data);
     }
 
     // Approve a token transfer (reverts if transfers are disabled).
-    function approve(address to, uint256 tokenId) public override (ERC721Upgradeable, IERC721) {
+    function approve(address to, uint256 tokenId) public override (ERC721, IERC721) {
         if (!_transfersEnabled) revert TransferDisabled();
         super.approve(to, tokenId);
     }
 
     // Set approval for all tokens (reverts if transfers are disabled).
-    function setApprovalForAll(address operator, bool _approved) public override (ERC721Upgradeable, IERC721) {
+    function setApprovalForAll(address operator, bool _approved) public override (ERC721, IERC721) {
         if (!_transfersEnabled) revert TransferDisabled();
         super.setApprovalForAll(operator, _approved);
     }
@@ -303,7 +305,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     * If the sender is not the trusted forwarder or the calldata length is insufficient,
     * it defaults to the original `msg.sender`.
     */
-    function _msgSender() internal view virtual override (ERC2771ContextUpgradeable, ContextUpgradeable) returns (address sender) {
+    function _msgSender() internal view virtual override (ERC2771Context, Context) returns (address sender) {
         if (isTrustedForwarder(msg.sender) && msg.data.length >= 20) {
             // Extracts the sender address from the end of the calldata. This is where
             // the sender's address is encoded in meta-transactions.
@@ -328,7 +330,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771ContextUpgradeable, ERC72
     * If the sender is not the trusted forwarder or the calldata length is less
     * than 20 bytes, it defaults to the original `msg.data`.
     */
-    function _msgData() internal view virtual override (ERC2771ContextUpgradeable, ContextUpgradeable) returns (bytes calldata) {
+    function _msgData() internal view virtual override (ERC2771Context, Context) returns (bytes calldata) {
         if (isTrustedForwarder(msg.sender) && msg.data.length >= 20) {
             // Strips the last 20 bytes (sender's address) from the calldata to retrieve
             // the original transaction data.

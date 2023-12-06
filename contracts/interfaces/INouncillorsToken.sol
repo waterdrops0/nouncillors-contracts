@@ -42,11 +42,9 @@ interface INouncillorsToken is IERC721 {
 
     error TransferDisabled();
 
-    error NonexistentTokenQuery(uint256 tokenId);
+    error DescriptorisLocked();
 
-    error DescriptorLocked();
-
-    error SeederLocked();
+    error SeederisLocked();
 
     function mint(bytes32[] calldata _merkleProof) external returns (uint256);
 
