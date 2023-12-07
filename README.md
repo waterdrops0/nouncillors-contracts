@@ -9,6 +9,6 @@ Nouncillors is an Ethereum-based smart contract collection developed using Solid
 
 ## Project Status
 
-This project is currently in the development stage. Future updates will include enhanced security features and an expanded test suite.
+This project is currently in the development stage. Feel free to fork the repository, submit pull requests, or open issues to discuss 
 
 Contributions and suggestions are welcome!
