@@ -29,5 +29,5 @@ This project is currently in the development stage. We encourage the community t
 
 ### Contributions and Suggestions
 
-Your contributions and suggestions are invaluable to us. Whether you're a developer, an artist, or an enthusiast, your input can help shape Nouncillors.
+Your contributions and suggestions are invaluable to us. Whether you're a developer, an artist, or an enthusiast, your input can help shape Nouncillors. We 💗 Nouns!
 
