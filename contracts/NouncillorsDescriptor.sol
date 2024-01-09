@@ -20,7 +20,7 @@ pragma solidity ^0.8.20;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import './interfaces/INouncillorsDescriptor.sol';
-import './interfaces/INouncillorsSeeder.sol';
+import './interfaces/INouncillorsToken.sol';
 import './libs/NFTDescriptor.sol';
 import './interfaces/ISVGRenderer.sol';
 import './interfaces/INouncillorsArt.sol';
@@ -397,7 +397,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
      * @notice Given a token ID and seed, construct a token URI for an official Nouncil Nouncillor.
      * @dev The returned value may be a base64 encoded data URI or an API URL.
      */
-    function tokenURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) external view override returns (string memory) {
+    function tokenURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view override returns (string memory) {
         if (isDataURIEnabled) {
             return dataURI(tokenId, seed);
         }
@@ -407,7 +407,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     /**
      * @notice Given a token ID and seed, construct a base64 encoded data URI for an official Nouncil Nouncillor.
      */
-    function dataURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) public view override returns (string memory) {
+    function dataURI(uint256 tokenId, INouncillorsToken.Seed memory seed) public view override returns (string memory) {
         string memory nouncillorId = tokenId.toString();
         string memory name = string(abi.encodePacked('Nouncillor ', nouncillorId));
         string memory description = string(abi.encodePacked('Nouncillor ', nouncillorId, ' is a member of the Nouncil'));
@@ -421,7 +421,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     function genericDataURI(
         string memory name,
         string memory description,
-        INouncillorsSeeder.Seed memory seed
+        INouncillorsToken.Seed memory seed
     ) public view override returns (string memory) {
         NFTDescriptor.TokenURIParams memory params = NFTDescriptor.TokenURIParams({
             name: name,
@@ -435,7 +435,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     /**
      * @notice Given a seed, construct a base64 encoded SVG image.
      */
-    function generateSVGImage(INouncillorsSeeder.Seed memory seed) external view override returns (string memory) {
+    function generateSVGImage(INouncillorsToken.Seed memory seed) external view override returns (string memory) {
         ISVGRenderer.SVGParams memory params = ISVGRenderer.SVGParams({
             parts: getPartsForSeed(seed),
             background: art.backgrounds(seed.background)
@@ -446,7 +446,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     /**
      * @notice Get all Nouncillor parts for the passed `seed`.
      */
-    function getPartsForSeed(INouncillorsSeeder.Seed memory seed) public view returns (ISVGRenderer.Part[] memory) {
+    function getPartsForSeed(INouncillorsToken.Seed memory seed) public view returns (ISVGRenderer.Part[] memory) {
         bytes memory body = art.bodies(seed.body);
         bytes memory accessory = art.accessories(seed.accessory);
         bytes memory head = art.heads(seed.head);

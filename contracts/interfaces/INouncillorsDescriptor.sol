@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.20;
 
-import './INouncillorsSeeder.sol';
+import './INouncillorsToken.sol';
 import './ISVGRenderer.sol';
 import './INouncillorsArt.sol';
 import './INouncillorsDescriptorMinimal.sol';
@@ -127,15 +127,15 @@ interface INouncillorsDescriptor is INouncillorsDescriptorMinimal {
 
     function setBaseURI(string calldata baseURI) external;
 
-    function tokenURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) external view override returns (string memory);
+    function tokenURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view override returns (string memory);
 
-    function dataURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) external view override returns (string memory);
+    function dataURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view override returns (string memory);
 
     function genericDataURI(
         string calldata name,
         string calldata description,
-        INouncillorsSeeder.Seed memory seed
+        INouncillorsToken.Seed memory seed
     ) external view returns (string memory);
 
-    function generateSVGImage(INouncillorsSeeder.Seed memory seed) external view returns (string memory);
+    function generateSVGImage(INouncillorsToken.Seed memory seed) external view returns (string memory);
 }

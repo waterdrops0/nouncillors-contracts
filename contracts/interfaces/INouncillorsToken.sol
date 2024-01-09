@@ -21,6 +21,14 @@ import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import './INouncillorsDescriptorMinimal.sol';
 
 interface INouncillorsToken is IERC721 {
+    struct Seed {
+        uint48 background;
+        uint48 body;
+        uint48 accessory;
+        uint48 head;
+        uint48 glasses;
+    }
+
     event NouncillorMinted(uint256 indexed tokenId, Seed seed, address indexed minter);
 
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
@@ -30,6 +38,8 @@ interface INouncillorsToken is IERC721 {
     event WhitelistUpdated(bytes32 indexed newMerkleRoot);
     
     event TransferabilityToggled(bool transfersEnabled);
+
+    error InvalidSeedTrait(string trait, uint256 invalidValue, uint256 maxValue);
 
     error NotWhitelisted();
 

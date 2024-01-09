@@ -28,14 +28,6 @@ import './interfaces/INouncillorsToken.sol';
 contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context {
     using MerkleProof for bytes32;
 
-    struct Seed {
-        uint48 background;
-        uint48 body;
-        uint48 accessory;
-        uint48 head;
-        uint48 glasses;
-    }
-
     // The descriptor contract that defines how Nouncillors NFTs should be displayed.
     INouncillorsDescriptorMinimal public descriptor;
 
@@ -156,6 +148,29 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
         // Revert if the sender is not whitelisted
         if (!isWhitelisted(sender, _merkleProof)) {
             revert NotWhitelisted();
+        }
+
+        // Validate seed values against the descriptor counts
+        uint256 backgroundCount = descriptor.backgroundCount();
+        uint256 bodyCount = descriptor.bodyCount();
+        uint256 accessoryCount = descriptor.accessoryCount();
+        uint256 headCount = descriptor.headCount();
+        uint256 glassesCount = descriptor.glassesCount();
+
+        if (_seed.background >= backgroundCount) {
+        revert InvalidSeedTrait("background", _seed.background, backgroundCount);
+        }
+        if (_seed.body >= bodyCount) {
+            revert InvalidSeedTrait("body", _seed.body, bodyCount);
+        }
+        if (_seed.accessory >= accessoryCount) {
+            revert InvalidSeedTrait("accessory", _seed.accessory, accessoryCount);
+        }
+        if (_seed.head >= headCount) {
+            revert InvalidSeedTrait("head", _seed.head, headCount);
+        }
+        if (_seed.glasses >= glassesCount) {
+            revert InvalidSeedTrait("glasses", _seed.glasses, glassesCount);
         }
 
         // Mark as minted and proceed to mint the token

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-/// @title Common interface for NouncillorsDescriptor, as used by NouncillorsToken and NouncillorsSeeder
+/// @title Common interface for NouncillorsDescriptor, as used by NouncillorsToken
 
 /*********************************
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ *
@@ -17,20 +17,13 @@
 
 pragma solidity ^0.8.20;
 
-import './INouncillorsSeeder.sol';
+import './INouncillorsToken.sol';
 
 interface INouncillorsDescriptorMinimal {
-    ///
-    /// USED BY TOKEN
-    ///
 
-    function tokenURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) external view returns (string memory);
+    function tokenURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view returns (string memory);
 
-    function dataURI(uint256 tokenId, INouncillorsSeeder.Seed memory seed) external view returns (string memory);
-
-    ///
-    /// USED BY SEEDER
-    ///
+    function dataURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view returns (string memory);
 
     function backgroundCount() external view returns (uint256);
 
