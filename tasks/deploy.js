@@ -6,7 +6,7 @@ task("deploy", "Deploys the Nouncillors contracts")
     console.log("Deploying contracts with the account:", deployer.address);
 
     const tokenName = "Nouncillors";
-    const tokenSymbol = "NOUNC";
+    const tokenSymbol = "NNN";
 
     // Calculate the expected address of NouncillorsArt
     const nonce = await deployer.provider.getTransactionCount(deployer.address); 
@@ -57,15 +57,9 @@ task("deploy", "Deploys the Nouncillors contracts")
     await nouncillorsArt.waitForDeployment();
     console.log("NouncillorsArt deployed to:", await nouncillorsArt.getAddress());
 
-    // Deploy NouncillorsSeeder
-    const NouncillorsSeeder = await hre.ethers.getContractFactory("NouncillorsSeeder");
-    const nouncillorsSeeder = await NouncillorsSeeder.deploy();
-    await nouncillorsSeeder.waitForDeployment();
-    console.log("Seeder deployed to:", await nouncillorsSeeder.getAddress());
-
      // Deploy the NouncillorsToken implementation contract
     const NouncillorsToken = await hre.ethers.getContractFactory("NouncillorsToken");
-    const nouncillorsToken = await NouncillorsToken.deploy('0xc0768A60Cf71341C942930E077b7EDf390c3E4c7', tokenName, tokenSymbol, erc2771Forwarder.target, nouncillorsSeeder.target, nouncillorsDescriptor.target);
+    const nouncillorsToken = await NouncillorsToken.deploy('0xc0768A60Cf71341C942930E077b7EDf390c3E4c7', tokenName, tokenSymbol, erc2771Forwarder.target, nouncillorsDescriptor.target);
     await nouncillorsToken.waitForDeployment();
     console.log("NouncillorsToken deployed to:", await nouncillorsToken.getAddress());
 
