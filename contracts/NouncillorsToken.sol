@@ -23,26 +23,27 @@ import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./interfaces/INouncillorsDescriptorMinimal.sol";
-import "./interfaces/INouncillorsSeeder.sol";
 import './interfaces/INouncillorsToken.sol';
 
 contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context {
     using MerkleProof for bytes32;
 
+    struct Seed {
+        uint48 background;
+        uint48 body;
+        uint48 accessory;
+        uint48 head;
+        uint48 glasses;
+    }
+
     // The descriptor contract that defines how Nouncillors NFTs should be displayed.
     INouncillorsDescriptorMinimal public descriptor;
-
-    // The seeder contract that provides the randomness seed for NFTs.
-    INouncillorsSeeder public seeder;
 
     // Whether the descriptor can be updated
     bool public isDescriptorLocked;
 
-    // Whether the seeder can be updated
-    bool public isSeederLocked;
-
     // Mapping from token ID to its corresponding seed.
-    mapping(uint256 => INouncillorsSeeder.Seed) public seeds;
+    mapping(uint256 => Seed) public seeds;
 
     // Counter for the current token ID.
     uint256 private _currentNouncillorId;
@@ -70,29 +71,17 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
     }
 
    /**
-    * @dev Ensures seeder is unlocked; reverts if locked.
-    */
-    modifier whenSeederNotLocked() {
-        if (isSeederLocked) {
-            revert SeederisLocked();
-        }
-        _;
-    }
-
-   /**
     * @dev Constructor for the NouncillorsToken contract.
     * @param name The name of the NFT collection.
     * @param symbol The symbol of the NFT collection.
     * @param _descriptor The address of the Nouncillors descriptor contract.
-    * @param _seeder The address of the Nouncillors seeder contract.
     * @param forwarder The address of the trusted forwarder for meta-transactions.
     */
     constructor(
+        address initialOwner,
         string memory name,
         string memory symbol,
-        address initialOwner,
         ERC2771Forwarder forwarder,
-        INouncillorsSeeder _seeder,
         INouncillorsDescriptorMinimal _descriptor
        
     ) 
@@ -101,12 +90,10 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
         ERC2771Context(address(forwarder)) 
     {
         _transfersEnabled = false; // Initially, transfers are disabled.
-        seeder = _seeder; // Set the seeder contract.
         descriptor = _descriptor; // Set the descriptor contract.
-        isSeederLocked = false; // Seeder is initially unlocked.
         isDescriptorLocked = false; // Descriptor is initially unlocked.
         _currentNouncillorId = 0; // Start token ID counter at 0.
-        _contractURIHash = 'EjsnYhfWQdasdACASf'; // Set initial URI hash.
+        _contractURIHash = 'EjsnYhfWQdasdACASf'; // Set URI hash.
     }
 
    /**
@@ -150,14 +137,15 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
     }
 
 
-   /**
-    * @notice Mints a new token if the sender is whitelisted and hasn't minted before.
-    * @dev Utilizes a Merkle proof to verify if the sender is whitelisted. Reverts if the sender
-    * has already minted a token or if they are not whitelisted.
-    * @param _merkleProof The Merkle proof that proves the sender's address is in the whitelist.
-    * @return The ID of the newly minted token.
-    */
-    function mint(bytes32[] calldata _merkleProof) external returns (uint256) {
+    /**
+     * @notice Mints a new token if the sender is whitelisted and hasn't minted before.
+     * @dev Utilizes a Merkle proof to verify if the sender is whitelisted. Reverts if the sender
+     * has already minted a token or if they are not whitelisted.
+     * @param _merkleProof The Merkle proof that proves the sender's address is in the whitelist.
+     * @param _seed The seed data to be associated with the minted Nouncillor NFT.
+     * @return The ID of the newly minted token.
+     */
+    function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256) {
         address sender = _msgSender();
 
         // Revert if the sender has already minted
@@ -172,7 +160,7 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
 
         // Mark as minted and proceed to mint the token
         hasMinted[sender] = true;
-        return _mintTo(sender, _currentNouncillorId++);
+        return _mintTo(sender, _currentNouncillorId++, _seed);
     }
 
    /**
@@ -250,37 +238,18 @@ contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context 
         emit DescriptorLocked();
     }
 
-    /**
-     * @notice Set the token seeder.
-     * @dev Only callable by the owner when not locked.
-     */
-    function setSeeder(INouncillorsSeeder _seeder) external onlyOwner whenSeederNotLocked {
-        seeder = _seeder;
-
-        emit SeederUpdated(_seeder);
-    }
-
-    /**
-     * @notice Lock the seeder.
-     * @dev This cannot be reversed and is only callable by the owner when not locked.
-     */
-    function lockSeeder() external onlyOwner whenSeederNotLocked {
-        isSeederLocked = true;
-
-        emit SeederLocked();
-    }
-
    /**
-    * @notice Internal function to mint a token to a specified address.
-    * @dev Mints a token to the given address, assigns a seed, emits a NouncillorMinted event,
-    * and returns the token ID.
-    * @param to The address to mint the token to.
-    * @param nouncillorId The ID of the token to be minted.
-    * @return The ID of the minted token.
-    */
-    function _mintTo(address to, uint256 nouncillorId) internal returns (uint256) {
-        // Generate a seed for the new token
-        INouncillorsSeeder.Seed memory seed = seeds[nouncillorId] = seeder.generateSeed(nouncillorId, descriptor);
+     * @notice Internal function to mint a token to a specified address.
+     * @dev Mints a token to the given address, uses the provided seed, emits a NouncillorMinted event,
+     * and returns the token ID.
+     * @param to The address to mint the token to.
+     * @param nouncillorId The ID of the token to be minted.
+     * @param seed The seed data to be associated with the minted Nouncillor NFT.
+     * @return The ID of the minted token.
+     */
+    function _mintTo(address to, uint256 nouncillorId, Seed calldata seed) internal returns (uint256) {
+        // Use the provided seed for the new token
+        seeds[nouncillorId] = seed;
 
         // Mint the token
         _safeMint(to, nouncillorId);

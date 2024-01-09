@@ -65,7 +65,7 @@ task("deploy", "Deploys the Nouncillors contracts")
 
      // Deploy the NouncillorsToken implementation contract
     const NouncillorsToken = await hre.ethers.getContractFactory("NouncillorsToken");
-    const nouncillorsToken = await NouncillorsToken.deploy(tokenName, tokenSymbol, '0xc0768A60Cf71341C942930E077b7EDf390c3E4c7', erc2771Forwarder.target, nouncillorsSeeder.target, nouncillorsDescriptor.target);
+    const nouncillorsToken = await NouncillorsToken.deploy('0xc0768A60Cf71341C942930E077b7EDf390c3E4c7', tokenName, tokenSymbol, erc2771Forwarder.target, nouncillorsSeeder.target, nouncillorsDescriptor.target);
     await nouncillorsToken.waitForDeployment();
     console.log("NouncillorsToken deployed to:", await nouncillorsToken.getAddress());
 
