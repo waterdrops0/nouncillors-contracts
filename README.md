@@ -9,6 +9,7 @@ Nouncillors is digital art project, designed to govern and support The Nouncil (
 ## Key Features
 
 - **Gasless Minting**
+- **Onchain Art**
 - **Dynamic Whitelisting**
 - **Non-Transferability**
 
