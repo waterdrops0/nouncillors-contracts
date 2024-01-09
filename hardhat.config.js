@@ -1,6 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("./task/deploy");
-require('./task/populate-descriptor');
+require("./tasks/deploy");
+require('./tasks/populate-descriptor');
 require('dotenv').config()
 
 module.exports = {
