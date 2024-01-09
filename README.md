@@ -4,7 +4,7 @@
 
 # Nouncillors
 
-Nouncillors is an innovative project, designed for creating and managing an NFT collection that empowers The Nouncil ([Nouncil Website](https://nouncil.wtf/)). This project is built from the ground up on the renowned Nouns Smart Contract Suite, but with significant customizations to align with Nouncil's specific needs.
+Nouncillors is an innovative art project, designed to empower The Nouncil ([Nouncil Website](https://nouncil.wtf/)). This project is built from the ground up on the renowned Nouns Smart Contract Suite, but with significant customizations to align with Nouncil's specific needs.
 
 ## Key Features
 
