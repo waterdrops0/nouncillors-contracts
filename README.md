@@ -4,7 +4,7 @@
 
 # Nouncillors
 
-Nouncillors is digital art project, designed to govern and support The Nouncil ([Nouncil Website](https://nouncil.wtf/)). It is built from the ground up on the renowned Nouns Smart Contract Suite, but with significant customizations to align with Nouncil's specific needs.
+Nouncillors is digital art project, designed to govern and support The Nouncil ([Nouncil Website](https://nouncil.wtf/)).
 
 ## Key Features
 
