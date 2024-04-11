@@ -28,5 +28,5 @@ In progres..
 
 ### Contributions and Suggestions
 
-Any contribution is welcome and greatly appreciated. We 💗 the Nouns
+Any contribution is welcome and greatly appreciated.
 
