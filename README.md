@@ -20,7 +20,7 @@ NouncillorsToken is deployed on the Sepolia Test Network at address:
 
 ## Project Status
 
-In progress..
+In progress. Feel free to:
 
 - **Fork the Repository**: Feel free to fork the repository.
 - **Submit Pull Requests**: If you've made improvements or fixes, please submit a pull request.
