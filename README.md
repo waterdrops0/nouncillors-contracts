@@ -4,7 +4,7 @@
 
 # Nouncillors
 
-Nouncillors is digital art project, designed to govern and support The Nouncil ([Nouncil Website](https://nouncil.wtf/)).
+Nouncillors is digital art project, designed to aid The Nouncil ([Nouncil Website](https://nouncil.wtf/)).
 
 ## Key Features
 
@@ -18,17 +18,15 @@ Nouncillors is digital art project, designed to govern and support The Nouncil (
 NouncillorsToken is deployed on the Sepolia Test Network at address: 
 `0x95745bB31eEb8278967f5E450dc8B31D34b02733`
 
-Please note that as the project is on the test network, interactions do not involve real assets.
-
 ## Project Status
 
-This project is currently in the development stage. We encourage the community to participate in the development process:
+In progres..
 
-- **Fork the Repository**: Feel free to fork the repository and explore the possibilities.
+- **Fork the Repository**: Feel free to fork the repository.
 - **Submit Pull Requests**: If you've made improvements or fixes, please submit a pull request.
-- **Open Issues for Discussion**: We welcome discussions on how to enhance the project further.
+- **Open Issues for Discussion**
 
 ### Contributions and Suggestions
 
-Your contributions and suggestions are invaluable to us. Whether you're a developer, an artist, or an enthusiast, your input can help shape Nouncillors. We 💗 the Nouns
+Any contribution is welcome and greatly appreciated. We 💗 the Nouns
 
