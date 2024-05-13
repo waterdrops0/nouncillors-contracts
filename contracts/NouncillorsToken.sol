@@ -17,15 +17,16 @@
 
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "./base/ERC721Checkpointable.sol";
 import "./interfaces/INouncillorsDescriptorMinimal.sol";
 import './interfaces/INouncillorsToken.sol';
 
-contract NouncillorsToken is INouncillorsToken, ERC721, Ownable, ERC2771Context {
+contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, ERC2771Context {
     using MerkleProof for bytes32;
 
     // The descriptor contract that defines how Nouncillors NFTs should be displayed.
