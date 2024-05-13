@@ -180,6 +180,14 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     }
 
    /**
+     * @notice Burn a nouncillor.
+     */
+    function burn(uint256 nounId) public override onlyOwner {
+        _burn(nouncillorId);
+        emit NouncillorBurned(nouncillorId);
+    }
+
+   /**
     * @notice Sets a new Merkle root for whitelist verification.
     * @dev Can only be called by the contract owner. Emits a WhitelistUpdated event upon change.
     * @param _newMerkleRoot The new Merkle root to be set for whitelist verification.
@@ -271,7 +279,7 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
         _safeMint(to, nouncillorId);
 
         // Emit an event for the minting
-        emit NouncillorMinted(nouncillorId, seed, to);
+        emit NouncillorCreated(nouncillorId, seed, to);
 
         return nouncillorId;
     }

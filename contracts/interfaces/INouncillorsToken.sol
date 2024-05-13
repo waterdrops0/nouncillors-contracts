@@ -29,7 +29,9 @@ interface INouncillorsToken is IERC721 {
         uint48 glasses;
     }
 
-    event NouncillorMinted(uint256 indexed tokenId, Seed seed, address indexed minter);
+    event NouncillorCreated(uint256 indexed tokenId, Seed seed, address indexed minter);
+
+    event NounBurned(uint256 indexed tokenId);
 
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
 
@@ -50,6 +52,8 @@ interface INouncillorsToken is IERC721 {
     error DescriptorisLocked();
 
     function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256);
+    
+    function burn(uint256 tokenId) external;
 
     function dataURI(uint256 tokenId) external returns (string memory);
 
