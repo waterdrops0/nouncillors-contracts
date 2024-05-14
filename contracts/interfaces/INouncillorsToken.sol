@@ -37,6 +37,10 @@ interface INouncillorsToken is IERC721 {
 
     event DescriptorLocked();
 
+    event SeederUpdated(INouncillorsSeeder seeder);
+
+    event SeederLocked();
+
     event WhitelistUpdated(bytes32 indexed newMerkleRoot);
     
     event TransferabilityToggled(bool transfersEnabled);
@@ -51,6 +55,8 @@ interface INouncillorsToken is IERC721 {
 
     error DescriptorisLocked();
 
+    error SeederisLocked();
+
     function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256);
     
     function burn(uint256 tokenId) external;
@@ -60,4 +66,8 @@ interface INouncillorsToken is IERC721 {
     function setDescriptor(INouncillorsDescriptorMinimal descriptor) external;
 
     function lockDescriptor() external;
+
+    function setSeeder(INouncillorsSeeder seeder) external;
+
+    function lockSeeder() external;
 }

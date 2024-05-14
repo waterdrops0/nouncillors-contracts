@@ -29,11 +29,18 @@ import './interfaces/INouncillorsToken.sol';
 contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, ERC2771Context {
     using MerkleProof for bytes32;
 
-    // The descriptor contract that defines how Nouncillors NFTs should be displayed.
+    // The Nouncillors token URI descriptor
     INouncillorsDescriptorMinimal public descriptor;
+
+    // The Nouncillors token seeder
+    INounsSeeder public seeder;
 
     // Whether the descriptor can be updated
     bool public isDescriptorLocked;
+
+
+    // Whether the seeder can be updated
+    bool public isSeederLocked;
 
     // Mapping from token ID to its corresponding seed.
     mapping(uint256 => Seed) public seeds;
@@ -54,12 +61,22 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     string private _contractURIHash;
 
    /**
-    * @dev Ensures descriptor is unlocked; reverts if locked.
+    * @notice Ensures descriptor has not been locked.
     */
     modifier whenDescriptorNotLocked() {
         if (isDescriptorLocked) {
             revert DescriptorisLocked();
         }
+        _;
+    }
+
+   /**
+    * @notice Ensures seeder has not been locked.
+    */
+    modifier whenSeederNotLocked() {
+        if (isSeederLocked) {
+            revert SeederisLocked();
+        } 
         _;
     }
 
@@ -260,6 +277,26 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
         isDescriptorLocked = true;
 
         emit DescriptorLocked();
+    }
+
+    /**
+     * @notice Set the token seeder.
+     * @dev Only callable by the owner when not locked.
+     */
+    function setSeeder(INouncillorsSeeder _seeder) external override onlyOwner whenSeederNotLocked {
+        seeder = _seeder;
+
+        emit SeederUpdated(_seeder);
+    }
+
+    /**
+     * @notice Lock the seeder.
+     * @dev This cannot be reversed and is only callable by the owner when not locked.
+     */
+    function lockSeeder() external override onlyOwner whenSeederNotLocked {
+        isSeederLocked = true;
+
+        emit SeederLocked();
     }
 
    /**
