@@ -29,6 +29,9 @@ import './interfaces/INouncillorsToken.sol';
 contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, ERC2771Context {
     using MerkleProof for bytes32;
 
+    // The Nouns DAO address
+    address public nounsDAO;
+
     // The Nouncillors token URI descriptor
     INouncillorsDescriptorMinimal public descriptor;
 
@@ -78,6 +81,16 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
             revert SeederisLocked();
         } 
         _;
+    }  
+
+   /**
+     * @notice Ensures that the sender is the Nouns DAO.
+     */
+    modifier onlyNounsDAO() {
+        if (msg.sender != nounsDAO) {
+            revert SenderNotNounsDAO();
+        }
+        _;
     }
 
    /**
@@ -88,11 +101,13 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     * @param forwarder The address of the trusted forwarder for meta-transactions.
     */
     constructor(
+        address _nounsDAO,
         address initialOwner,
         string memory name,
         string memory symbol,
         ERC2771Forwarder forwarder,
-        INouncillorsDescriptorMinimal _descriptor
+        INouncillorsDescriptorMinimal _descriptor,
+        INounsSeeder _seeder
        
     ) 
         ERC721(name, symbol) 
@@ -100,7 +115,9 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
         ERC2771Context(address(forwarder)) 
     {
         _transfersEnabled = false; // Initially, transfers are disabled.
+        nounsDAO = _nounsDAO;
         descriptor = _descriptor; // Set the descriptor contract.
+        seeder = _seeder; // Set the seeder contract.
         isDescriptorLocked = false; // Descriptor is initially unlocked.
         _currentNouncillorId = 0; // Start token ID counter at 0.
         _contractURIHash = 'EjsnYhfWQdasdACASf'; // Set URI hash.
@@ -230,7 +247,7 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     * @notice Toggles the transferability of the tokens.
     * @dev Can only be called by the contract owner. Emits TransferabilityToggled event.
     */
-    function toggleTransferability() public onlyOwner {
+    function toggleTransferability() public onlyNounsDAO {
         _transfersEnabled = !_transfersEnabled;
         emit TransferabilityToggled(_transfersEnabled);
     }
@@ -257,6 +274,16 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     function setApprovalForAll(address operator, bool _approved) public override (ERC721, IERC721) {
         if (!_transfersEnabled) revert TransferDisabled();
         super.setApprovalForAll(operator, _approved);
+    }
+
+    /**
+     * @notice Set the Nouns DAO address.
+     * @dev Only callable by the Nouns DAO.
+     */
+    function setNounsDAO(address _noundersDAO) external onlyNounsDAO {
+        nounsDAO = _nounsDAO;
+
+        emit NounsDAOUpdated(_nounsDAO);
     }
 
     /**

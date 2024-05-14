@@ -33,6 +33,8 @@ interface INouncillorsToken is IERC721 {
 
     event NounBurned(uint256 indexed tokenId);
 
+    event NounsDAOUpdated(address nounsDAO);
+
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
 
     event DescriptorLocked();
@@ -53,6 +55,8 @@ interface INouncillorsToken is IERC721 {
 
     error TransferDisabled();
 
+    error SenderisNotNounsDAO();
+
     error DescriptorisLocked();
 
     error SeederisLocked();
@@ -62,6 +66,8 @@ interface INouncillorsToken is IERC721 {
     function burn(uint256 tokenId) external;
 
     function dataURI(uint256 tokenId) external returns (string memory);
+
+    function setNounsDAO(address nounsDAO);
 
     function setDescriptor(INouncillorsDescriptorMinimal descriptor) external;
 
