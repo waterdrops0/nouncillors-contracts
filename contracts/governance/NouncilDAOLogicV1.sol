@@ -20,7 +20,7 @@
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoDelegate.sol
 //
 // GovernorBravoDelegate.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
-// With modifications by 
+// With modifications by ⌐◧-◧
 //
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
