@@ -88,7 +88,7 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
      */
     modifier onlyNounsDAO() {
         if (msg.sender != nounsDAO) {
-            revert SenderNotNounsDAO();
+            revert SenderisNotNounsDAO();
         }
         _;
     }
