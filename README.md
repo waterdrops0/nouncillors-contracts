@@ -13,6 +13,8 @@ Nouncillors is digital art project, designed to aid The Nouncil ([Nouncil Websit
 - **Dynamic Whitelisting**
 - **Non-Transferability**
 
+## Smart Contract overview
+
 ## Deployed Contract Address
 
 NouncillorsToken is deployed on the Sepolia Test Network at address: 
