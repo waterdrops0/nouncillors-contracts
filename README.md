@@ -6,15 +6,15 @@
 
 Nouncillors is digital art project, designed to aid The Nouncil ([Nouncil Website](https://nouncil.wtf/)).
 
+## Smart Contract Overview
+coming soon 🏗️
+
 ## Key Features
 
 - **Gasless Minting**
 - **Onchain Art**
 - **Dynamic Whitelisting**
 - **Non-Transferability**
-
-## Smart Contract Overview
-coming soon
 
 ## Deployed Contract Address
 
