@@ -13,7 +13,8 @@ Nouncillors is digital art project, designed to aid The Nouncil ([Nouncil Websit
 - **Dynamic Whitelisting**
 - **Non-Transferability**
 
-## Smart Contract overview
+## Smart Contract Overview
+coming soon
 
 ## Deployed Contract Address
 
