@@ -2,13 +2,6 @@
 
 ![Nouncil Logo](https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6)
 
-## Key Features
-
-- **Gasless Minting**
-- **Onchain Art**
-- **Dynamic Whitelisting**
-- **Non-Transferability**
-
 ## Smart Contract Overview
 
 | Name                        | Address                                    | Sepoliascan                                                                                     |
@@ -23,6 +16,13 @@
 | NouncilDAOProxy.sol         |                                            |                                                                                                 |
 | NouncilDAOLogic.sol         |                                            |                                                                                                 |
 | NouncilDAOExecutor.sol      |                                            |                                                                                                 |
+
+## Key Features
+
+- **Gasless Minting**
+- **Onchain Art**
+- **Dynamic Whitelisting**
+- **Non-Transferability**
 
 ## Feel free to:
 
