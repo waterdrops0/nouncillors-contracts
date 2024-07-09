@@ -4,7 +4,7 @@
 
 ## Smart Contract Overview
 
-The Nouncil Protocol is comprised of two main components: Nouncillors and the DAO. The suite of smart contracts grants full access to the membership whitelist and the generative art that drives the protocol.
+Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO. The suite of smart contracts grants full access to the membership whitelist and the generative art that drives the protocol.
 
 ## Contracts
 
@@ -23,16 +23,16 @@ The Nouncil Protocol is comprised of two main components: Nouncillors and the DA
 
 ## Key Features
 
-- **Gasless Minting**
-- **Onchain Art**
-- **Dynamic Whitelisting**
-- **Non-Transferability**
+- Gasless Minting
+- Onchain Art
+- Dynamic Whitelisting
+- Non-Transferability
 
 ## Feel free to:
 
-- **Fork the Repository**
-- **Submit Pull Requests**
-- **Open Issues for Discussion**
+- Fork the Repository
+- Submit Pull Requests
+- Open Issues for Discussion
 
 ### Contributions and Suggestions
 
