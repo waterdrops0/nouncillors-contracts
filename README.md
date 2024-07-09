@@ -2,13 +2,6 @@
 
 ![Nouncil Logo](https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6)
 
-# Nouncillors
-
-Nouncillors is digital art project, designed to aid The Nouncil ([Nouncil Website](https://nouncil.wtf/)).
-
-## Smart Contract Overview
-coming soon 🏗️
-
 ## Key Features
 
 - **Gasless Minting**
@@ -16,20 +9,28 @@ coming soon 🏗️
 - **Dynamic Whitelisting**
 - **Non-Transferability**
 
-## Deployed Contract Address
+## Smart Contract Overview
 
-NouncillorsToken is deployed on the Sepolia Test Network at address: 
-`0x95745bB31eEb8278967f5E450dc8B31D34b02733`
+| Name                        | Address                                    | Sepoliascan                                                                                     |
+|-----------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------|
+| NouncillorsToken.sol        | 0x95745bB31eEb8278967f5E450dc8B31D34b02733 | https://sepolia.etherscan.io/address/0x95745bB31eEb8278967f5E450dc8B31D34b02733                  |
+| NouncillorsDescriptor.sol   |                                            |                                                                                                 |
+| NFTDescriptor.sol           |                                            |                                                                                                 |
+| NouncillorsArt.sol          |                                            |                                                                                                 |
+| Inflator.sol                |                                            |                                                                                                 |
+| SVGRenderer.sol             |                                            |                                                                                                 |
+| ERC2771Forwarder.sol        |                                            |                                                                                                 |
+| NouncilDAOProxy.sol         |                                            |                                                                                                 |
+| NouncilDAOLogic.sol         |                                            |                                                                                                 |
+| NouncilDAOExecutor.sol      |                                            |                                                                                                 |
 
-## Project Status
+## Feel free to:
 
-In progress. Feel free to:
-
-- **Fork the Repository**: Feel free to fork the repository.
-- **Submit Pull Requests**: If you've made improvements or fixes, please submit a pull request.
+- **Fork the Repository**
+- **Submit Pull Requests**
 - **Open Issues for Discussion**
 
 ### Contributions and Suggestions
 
-Any contribution is welcome and greatly appreciated.
+Any contribution is welcome and greatly appreciated. ⌐◨-◨
 
