@@ -4,7 +4,7 @@
 
 ## Smart Contract Overview
 
-Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO. This suite of smart contracts grants full access to the membership whitelist and the art that drives the protocol.
+Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO. This suite of smart contracts grants full access to the membership whitelist and the art that powers the protocol.
 
 ## Contracts
 
