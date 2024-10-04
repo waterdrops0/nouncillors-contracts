@@ -1,40 +1,66 @@
+## Foundry
 
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-![Nouncil Logo](https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6)
+Foundry consists of:
 
-## Smart Contract Overview
+-   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+-   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+-   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+-   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO.
+## Documentation
 
-## Contracts
+https://book.getfoundry.sh/
 
-| Name                        | Address                                    | Sepoliascan                                                                                     |
-|-----------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------|
-| NouncillorsToken.sol        | 0x95745bB31eEb8278967f5E450dc8B31D34b02733 | https://sepolia.etherscan.io/address/0x95745bB31eEb8278967f5E450dc8B31D34b02733                  |
-| NouncillorsDescriptor.sol   |                                            |                                                                                                 |
-| NFTDescriptor.sol           |                                            |                                                                                                 |
-| NouncillorsArt.sol          |                                            |                                                                                                 |
-| Inflator.sol                |                                            |                                                                                                 |
-| SVGRenderer.sol             |                                            |                                                                                                 |
-| ERC2771Forwarder.sol        |                                            |                                                                                                 |
-| NouncilDAOProxy.sol         |                                            |                                                                                                 |
-| NouncilDAOLogic.sol         |                                            |                                                                                                 |
-| NouncilDAOExecutor.sol      |                                            |                                                                                                 |
+## Usage
 
-## Key Features
+### Build
 
-- Gasless Minting
-- Onchain Art
-- Dynamic Whitelisting
-- Non-Transferability
+```shell
+$ forge build
+```
 
-## Feel free to:
+### Test
 
-- Fork the Repository
-- Submit Pull Requests
-- Open Issues for Discussion
+```shell
+$ forge test
+```
 
-### Contributions and Suggestions
+### Format
 
-Any contribution is welcome and greatly appreciated. ⌐◨-◨
+```shell
+$ forge fmt
+```
 
+### Gas Snapshots
+
+```shell
+$ forge snapshot
+```
+
+### Anvil
+
+```shell
+$ anvil
+```
+
+### Deploy
+
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+
+### Cast
+
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```
