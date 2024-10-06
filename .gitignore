@@ -1,6 +1,9 @@
 node_modules
 .env
 
+# Foundry files
+lib/
+
 # Hardhat files
 /cache
 /artifacts

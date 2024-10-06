@@ -4,16 +4,16 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 
 // Import contracts
+import "../contracts/libs/NFTDescriptor.sol";
 import "../contracts/NouncillorsToken.sol";
 import "../contracts/NouncillorsDescriptor.sol";
-import "../contracts/NFTDescriptor.sol";
 import "../contracts/NouncillorsArt.sol";
 import "../contracts/Inflator.sol";
 import "../contracts/SVGRenderer.sol";
 import "../contracts/ERC2771Forwarder.sol";
-import "../contracts/NouncilDAOProxy.sol";
-import "../contracts/NouncilDAOLogic.sol";
-import "../contracts/NouncilDAOExecutor.sol";
+import "../contracts/governance/NouncilDAOProxy.sol";
+import "../contracts/governance/NouncilDAOLogicV1.sol";
+import "../contracts/governance/NouncilDAOExecutor.sol";
 
 contract DeployNouncilProtocol is Script {
     function run() public {

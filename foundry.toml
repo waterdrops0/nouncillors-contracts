@@ -8,7 +8,7 @@ fs_permissions = [{ access = "read", path = "./"}]
 [profile.lite]
 optimizer = false
 
-[libraries]
+# [libraries]
 # NouncillorsDescriptor.sol:NouncillorsDescriptor = "{NFTDescriptor address}"
 
 
