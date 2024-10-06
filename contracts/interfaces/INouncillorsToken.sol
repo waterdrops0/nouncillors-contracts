@@ -31,17 +31,13 @@ interface INouncillorsToken is IERC721 {
 
     event NouncillorCreated(uint256 indexed tokenId, Seed seed, address indexed minter);
 
-    event NounBurned(uint256 indexed tokenId);
+    event NouncillorBurned(uint256 indexed tokenId);
 
-    event NounsDAOUpdated(address nounsDAO);
+    event NouncilDAOUpdated(address nounsDAO);
 
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
 
     event DescriptorLocked();
-
-    event SeederUpdated(INouncillorsSeeder seeder);
-
-    event SeederLocked();
 
     event WhitelistUpdated(bytes32 indexed newMerkleRoot);
     
@@ -55,11 +51,9 @@ interface INouncillorsToken is IERC721 {
 
     error TransferDisabled();
 
-    error SenderisNotNounsDAO();
+    error SenderisNotNouncilDAO();
 
     error DescriptorisLocked();
-
-    error SeederisLocked();
 
     function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256);
     
@@ -67,13 +61,10 @@ interface INouncillorsToken is IERC721 {
 
     function dataURI(uint256 tokenId) external returns (string memory);
 
-    function setNounsDAO(address nounsDAO);
+    function setNouncilDAO(address nouncilDAO);
 
     function setDescriptor(INouncillorsDescriptorMinimal descriptor) external;
 
     function lockDescriptor() external;
 
-    function setSeeder(INouncillorsSeeder seeder) external;
-
-    function lockSeeder() external;
 }

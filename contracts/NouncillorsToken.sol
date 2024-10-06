@@ -29,21 +29,12 @@ import './interfaces/INouncillorsToken.sol';
 contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, ERC2771Context {
     using MerkleProof for bytes32;
 
-    // The Nouns DAO address
-    address public nounsDAO;
-
     // The Nouncillors token URI descriptor
     INouncillorsDescriptorMinimal public descriptor;
-
-    // The Nouncillors token seeder
-    INounsSeeder public seeder;
 
     // Whether the descriptor can be updated
     bool public isDescriptorLocked;
 
-
-    // Whether the seeder can be updated
-    bool public isSeederLocked;
 
     // Mapping from token ID to its corresponding seed.
     mapping(uint256 => Seed) public seeds;
@@ -74,26 +65,6 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     }
 
    /**
-    * @notice Ensures seeder has not been locked.
-    */
-    modifier whenSeederNotLocked() {
-        if (isSeederLocked) {
-            revert SeederisLocked();
-        } 
-        _;
-    }  
-
-   /**
-     * @notice Ensures that the sender is the Nouns DAO.
-     */
-    modifier onlyNounsDAO() {
-        if (msg.sender != nounsDAO) {
-            revert SenderisNotNounsDAO();
-        }
-        _;
-    }
-
-   /**
     * @dev Constructor for the NouncillorsToken contract.
     * @param name The name of the NFT collection.
     * @param symbol The symbol of the NFT collection.
@@ -101,23 +72,19 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     * @param forwarder The address of the trusted forwarder for meta-transactions.
     */
     constructor(
-        address _nounsDAO,
         address initialOwner,
         string memory name,
         string memory symbol,
         ERC2771Forwarder forwarder,
-        INouncillorsDescriptorMinimal _descriptor,
-        INounsSeeder _seeder
+        INouncillorsDescriptorMinimal _descriptor
        
     ) 
         ERC721(name, symbol) 
         Ownable(initialOwner)
         ERC2771Context(address(forwarder)) 
     {
-        _transfersEnabled = false; // Initially, transfers are disabled.
-        nounsDAO = _nounsDAO;
+        _transfersEnabled = false; // Transfers are disabled.
         descriptor = _descriptor; // Set the descriptor contract.
-        seeder = _seeder; // Set the seeder contract.
         isDescriptorLocked = false; // Descriptor is initially unlocked.
         _currentNouncillorId = 0; // Start token ID counter at 0.
         _contractURIHash = 'EjsnYhfWQdasdACASf'; // Set URI hash.
@@ -247,7 +214,7 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     * @notice Toggles the transferability of the tokens.
     * @dev Can only be called by the contract owner. Emits TransferabilityToggled event.
     */
-    function toggleTransferability() public onlyNounsDAO {
+    function toggleTransferability() public onlyOwner {
         _transfersEnabled = !_transfersEnabled;
         emit TransferabilityToggled(_transfersEnabled);
     }
@@ -277,16 +244,6 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     }
 
     /**
-     * @notice Set the Nouns DAO address.
-     * @dev Only callable by the Nouns DAO.
-     */
-    function setNounsDAO(address _noundersDAO) external onlyNounsDAO {
-        nounsDAO = _nounsDAO;
-
-        emit NounsDAOUpdated(_nounsDAO);
-    }
-
-    /**
      * @notice Set the token URI descriptor.
      * @dev Only callable by the owner when not locked.
      */
@@ -304,26 +261,6 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
         isDescriptorLocked = true;
 
         emit DescriptorLocked();
-    }
-
-    /**
-     * @notice Set the token seeder.
-     * @dev Only callable by the owner when not locked.
-     */
-    function setSeeder(INouncillorsSeeder _seeder) external override onlyOwner whenSeederNotLocked {
-        seeder = _seeder;
-
-        emit SeederUpdated(_seeder);
-    }
-
-    /**
-     * @notice Lock the seeder.
-     * @dev This cannot be reversed and is only callable by the owner when not locked.
-     */
-    function lockSeeder() external override onlyOwner whenSeederNotLocked {
-        isSeederLocked = true;
-
-        emit SeederLocked();
     }
 
    /**

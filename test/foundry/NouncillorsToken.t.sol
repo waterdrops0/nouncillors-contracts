@@ -3,8 +3,7 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
-import { NouncillorsDescriptorV2 } from '../../contracts/NouncillorsDescriptorV2.sol';
-import { NouncillorsSeeder } from '../../contracts/NouncillorsSeeder.sol';
+import { NouncillorsDescriptorV2 } from '../../contracts/NouncillorsDescriptor.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
 import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
@@ -19,7 +18,7 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         NouncillorsDescriptorV2 descriptor = _deployAndPopulateV2();
         _populateDescriptorV2(descriptor);
 
-        nouncillorsToken = new NouncillorsToken(owner, minter, descriptor, new NouncillorsSeeder(), IProxyRegistry(address(0)));
+        nouncillorsToken = new NouncillorsToken(owner, minter, descriptor, IProxyRegistry(address(0)));
     }
 
     function testSymbol() public {
