@@ -4,13 +4,12 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 
 // Import contracts
-import "../contracts/libs/NFTDescriptor.sol";
 import "../contracts/NouncillorsToken.sol";
 import "../contracts/NouncillorsDescriptor.sol";
 import "../contracts/NouncillorsArt.sol";
 import "../contracts/Inflator.sol";
 import "../contracts/SVGRenderer.sol";
-import "../contracts/ERC2771Forwarder.sol";
+import '@openzeppelin/contracts/metatx/ERC2771Forwarder.sol';
 import "../contracts/governance/NouncilDAOProxy.sol";
 import "../contracts/governance/NouncilDAOLogicV1.sol";
 import "../contracts/governance/NouncilDAOExecutor.sol";
@@ -23,45 +22,53 @@ contract DeployNouncilProtocol is Script {
         // Start broadcasting transactions
         vm.startBroadcast(deployerPrivateKey);
 
-        // Begin deployment
-        console2.log("Deploying contracts...");
-
         // Initialize variables
         string memory tokenName = "Nouncillors";
         string memory tokenSymbol = "NNN";
 
-        // Deploy SVGRenderer
+        // Begin deployment process
+        console2.log("Deploying contracts...");
+
+        // Deploy SVGRenderer (which implements ISVGRenderer)
         SVGRenderer svgRenderer = new SVGRenderer();
         console2.log("SVGRenderer deployed to:", address(svgRenderer));
 
-        // Deploy Inflator
+        // Deploy Inflator (which implements IInflator)
         Inflator inflator = new Inflator();
         console2.log("Inflator deployed to:", address(inflator));
-
-        // Deploy NFTDescriptor
-        NFTDescriptor nftDescriptor = new NFTDescriptor();
-        console2.log("NFTDescriptor deployed to:", address(nftDescriptor));
 
         // Deploy ERC2771Forwarder
         ERC2771Forwarder erc2771Forwarder = new ERC2771Forwarder("NouncilForwarder");
         console2.log("ERC2771Forwarder deployed to:", address(erc2771Forwarder));
 
-        // Deploy NouncillorsArt
-        // We set the descriptor address to zero initially and update it later
-        NouncillorsArt nouncillorsArt = new NouncillorsArt(address(0), address(inflator));
-        console2.log("NouncillorsArt deployed to:", address(nouncillorsArt));
+        // Calculate expected address for NouncillorsArt contract
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, block.timestamp)); // Generate a unique salt
+        address expectedNouncillorsArtAddress = address(
+            uint160(uint256(keccak256(
+                abi.encodePacked(
+                    bytes1(0xff), // 0xff is the "CREATE2" prefix byte
+                    address(this), // The contract address deploying
+                    salt,          // Salt for the deterministic address
+                    keccak256(type(NouncillorsArt).creationCode) // Bytecode hash of NouncillorsArt
+                )
+            )))
+        );
+        console2.log("Expected NouncillorsArt address:", expectedNouncillorsArtAddress);
 
-        // Deploy NouncillorsDescriptor with linked NFTDescriptor library
-        // You need to link the library manually during compilation
+        // Deploy NouncillorsDescriptor using SVGRenderer and expected NouncillorsArt address
         NouncillorsDescriptor nouncillorsDescriptor = new NouncillorsDescriptor(
             msg.sender,
-            address(nouncillorsArt),
-            address(svgRenderer)
+            INouncillorsArt(expectedNouncillorsArtAddress), // This expects a contract instance of INouncillorsArt
+            ISVGRenderer(address(svgRenderer)) // Pass the SVGRenderer contract instance (cast as ISVGRenderer)
         );
         console2.log("NouncillorsDescriptor deployed to:", address(nouncillorsDescriptor));
 
-        // Update the NouncillorsArt with the descriptor address
-        nouncillorsArt.setDescriptor(address(nouncillorsDescriptor));
+        // Deploy NouncillorsArt using the NouncillorsDescriptor and Inflator (pass the contract instance, not address)
+        NouncillorsArt nouncillorsArt = new NouncillorsArt(
+            address(nouncillorsDescriptor),
+            IInflator(address(inflator)) // Pass the Inflator contract instance (cast as IInflator)
+        );
+        console2.log("NouncillorsArt deployed to:", address(nouncillorsArt));
 
         // Deploy NouncillorsToken
         NouncillorsToken nouncillorsToken = new NouncillorsToken(
@@ -69,29 +76,9 @@ contract DeployNouncilProtocol is Script {
             tokenName,
             tokenSymbol,
             address(erc2771Forwarder),
-            address(nouncillorsDescriptor)
+            INouncillorsDescriptor(address(nouncillorsDescriptor))
         );
         console2.log("NouncillorsToken deployed to:", address(nouncillorsToken));
-
-        // Deploy NouncilDAOExecutor
-        address admin = msg.sender;
-        uint256 delay = 2 days; // Example delay
-        NouncilDAOExecutor daoExecutor = new NouncilDAOExecutor(admin, delay);
-        console2.log("NouncilDAOExecutor deployed to:", address(daoExecutor));
-
-        // Deploy NouncilDAOLogic (implementation contract)
-        NouncilDAOLogic daoLogic = new NouncilDAOLogic();
-        console2.log("NouncilDAOLogic deployed to:", address(daoLogic));
-
-        // Deploy NouncilDAOProxy (proxy contract)
-        NouncilDAOProxy daoProxy = new NouncilDAOProxy(
-            address(daoExecutor),
-            address(nouncillorsToken),
-            admin,
-            address(daoLogic),
-            delay
-        );
-        console2.log("NouncilDAOProxy deployed to:", address(daoProxy));
 
         // Finish deployment
         vm.stopBroadcast();

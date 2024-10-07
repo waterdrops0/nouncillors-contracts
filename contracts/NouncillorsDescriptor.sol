@@ -21,7 +21,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 import './interfaces/INouncillorsDescriptor.sol';
 import './interfaces/INouncillorsToken.sol';
-import './libs/NFTDescriptor.sol';
+import { NFTDescriptor } from "../contracts/libs/NFTDescriptor.sol";
 import './interfaces/ISVGRenderer.sol';
 import './interfaces/INouncillorsArt.sol';
 import './interfaces/IInflator.sol';

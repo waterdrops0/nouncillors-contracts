@@ -19,14 +19,13 @@ pragma solidity ^0.8.20;
 
 
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./base/ERC721Checkpointable.sol";
 import "./interfaces/INouncillorsDescriptorMinimal.sol";
 import './interfaces/INouncillorsToken.sol';
 
-contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, ERC2771Context {
+contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721Checkpointable {
     using MerkleProof for bytes32;
 
     // The Nouncillors token URI descriptor
@@ -69,19 +68,19 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     * @param name The name of the NFT collection.
     * @param symbol The symbol of the NFT collection.
     * @param _descriptor The address of the Nouncillors descriptor contract.
-    * @param forwarder The address of the trusted forwarder for meta-transactions.
+    * @param trustedForwarder The address of the trusted forwarder for meta-transactions.
     */
     constructor(
         address initialOwner,
         string memory name,
         string memory symbol,
-        ERC2771Forwarder forwarder,
+        address trustedForwarder,
         INouncillorsDescriptorMinimal _descriptor
        
     ) 
         ERC721(name, symbol) 
         Ownable(initialOwner)
-        ERC2771Context(address(forwarder)) 
+        ERC2771Context(address(trustedForwarder)) 
     {
         _transfersEnabled = false; // Transfers are disabled.
         descriptor = _descriptor; // Set the descriptor contract.
@@ -142,6 +141,8 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
     function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256) {
         address sender = _msgSender();
 
+        require(sender != address(0), "Cannot mint to the zero address");
+
         // Revert if the sender has already minted
         if (hasMinted[sender]) {
             revert AlreadyClaimed();
@@ -180,10 +181,52 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
         return _mintTo(sender, _currentNouncillorId++, _seed);
     }
 
+        /**
+    * @notice Mints a new token to the specified address with the provided seed.
+    * @dev Can only be called by the contract owner.
+    * @param _seed The seed data to be associated with the minted Nouncillor NFT.
+    * @param recipient The address to mint the token to.
+    */
+    function mint_new(Seed calldata _seed, address recipient) external onlyOwner {
+        require(recipient != address(0), "Cannot mint to the zero address");
+
+        // Revert if the sender has already minted
+        if (hasMinted[recipient]) {
+            revert AlreadyClaimed();
+        }
+
+        // Validate seed values against the descriptor counts
+        uint256 backgroundCount = descriptor.backgroundCount();
+        uint256 bodyCount = descriptor.bodyCount();
+        uint256 accessoryCount = descriptor.accessoryCount();
+        uint256 headCount = descriptor.headCount();
+        uint256 glassesCount = descriptor.glassesCount();
+
+        if (_seed.background >= backgroundCount) {
+            revert InvalidSeedTrait("background", _seed.background, backgroundCount);
+        }
+        if (_seed.body >= bodyCount) {
+            revert InvalidSeedTrait("body", _seed.body, bodyCount);
+        }
+        if (_seed.accessory >= accessoryCount) {
+            revert InvalidSeedTrait("accessory", _seed.accessory, accessoryCount);
+        }
+        if (_seed.head >= headCount) {
+            revert InvalidSeedTrait("head", _seed.head, headCount);
+        }
+        if (_seed.glasses >= glassesCount) {
+            revert InvalidSeedTrait("glasses", _seed.glasses, glassesCount);
+        }
+
+        // Mark as minted and proceed to mint the token
+        hasMinted[recipient] = true;
+        _mintTo(recipient, _currentNouncillorId++, _seed);
+    }
+
    /**
      * @notice Burn a nouncillor.
      */
-    function burn(uint256 nounId) public override onlyOwner {
+    function burn(uint256 nouncillorId) public override onlyOwner {
         _burn(nouncillorId);
         emit NouncillorBurned(nouncillorId);
     }
@@ -278,60 +321,24 @@ contract NouncillorsToken is INouncillorsToken, Ownable, ERC721Checkpointable, E
 
         // Mint the token
         _safeMint(to, nouncillorId);
-
+ 
         // Emit an event for the minting
         emit NouncillorCreated(nouncillorId, seed, to);
 
         return nouncillorId;
     }
 
-   /**
-    * @dev Overrides the `_msgSender` function to support meta-transactions.
-    * Meta-transactions allow a user to interact with the contract indirectly,
-    * through a trusted forwarder. This helps users by allowing transactions
-    * without needing ETH for gas, with the forwarder paying for it instead.
-    * 
-    * The function checks if the sender is the trusted forwarder and if the calldata
-    * length is sufficient (at least 20 bytes, the size of an Ethereum address).
-    * If both conditions are met, it interprets the sender as being the original
-    * sender from the calldata, thus supporting meta-transactions.
-    *
-    * If the sender is not the trusted forwarder or the calldata length is insufficient,
-    * it defaults to the original `msg.sender`.
-    */
-    function _msgSender() internal view virtual override (ERC2771Context, Context) returns (address sender) {
-        if (isTrustedForwarder(msg.sender) && msg.data.length >= 20) {
-            // Extracts the sender address from the end of the calldata. This is where
-            // the sender's address is encoded in meta-transactions.
-            // We use assembly for efficiency; `shr(96, calldataload(sub(calldatasize(), 20)))`
-            // right-shifts the last 20 bytes of calldata (sender's address) to align it as an address.
-            /// @solidity memory-safe-assembly
-            assembly {
-                sender := shr(96, calldataload(sub(calldatasize(), 20)))
-            }
-        } else {
-            // If not a meta-transaction, just use the standard `msg.sender`.
-            return super._msgSender();
-        }
+    // Override _msgSender and _msgData
+    function _msgSender() internal view virtual override(Context, ERC2771Context) returns (address) {
+        return ERC2771Context._msgSender();
     }
 
-   /**
-    * @dev Overrides the `_msgData` function to support meta-transactions.
-    * In the context of meta-transactions, the original transaction data
-    * is sent along with the sender's address (last 20 bytes of calldata).
-    * This function removes these last 20 bytes to obtain the original `msg.data`.
-    *
-    * If the sender is not the trusted forwarder or the calldata length is less
-    * than 20 bytes, it defaults to the original `msg.data`.
-    */
-    function _msgData() internal view virtual override (ERC2771Context, Context) returns (bytes calldata) {
-        if (isTrustedForwarder(msg.sender) && msg.data.length >= 20) {
-            // Strips the last 20 bytes (sender's address) from the calldata to retrieve
-            // the original transaction data.
-            return msg.data[:msg.data.length - 20];
-        } else {
-            // If not a meta-transaction, just use the standard `msg.data`.
-            return super._msgData();
-        }
+    function _msgData() internal view virtual override(Context, ERC2771Context) returns (bytes calldata) {
+        return ERC2771Context._msgData();
+    }
+
+    // Override _contextSuffixLenght
+    function _contextSuffixLength() internal view virtual override(Context, ERC2771Context) returns (uint256) {
+        return ERC2771Context._contextSuffixLength();
     }
 }

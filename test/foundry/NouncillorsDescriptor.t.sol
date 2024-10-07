@@ -3,10 +3,9 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import 'forge-std/StdJson.sol';
-import { NouncillorsDescriptorV2 } from '../../contracts/NouncillorsDescriptorV2.sol';
+import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol';
 import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
 import { ISVGRenderer } from '../../contracts/interfaces/ISVGRenderer.sol';
-import { INouncillorsSeeder } from '../../contracts/interfaces/INouncillorsSeeder.sol';
 import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
 import { INouncillorsArt } from '../../contracts/interfaces/INouncillorsArt.sol';
 import { Base64 } from 'base64-sol/base64.sol';
@@ -15,14 +14,14 @@ import { IInflator } from '../../contracts/interfaces/IInflator.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
 import { strings } from './lib/strings.sol';
 
-contract NouncillorsDescriptorV2Test is Test {
+contract NouncillorsDescriptorTest is Test {
     NouncillorsDescriptorV2 descriptor;
     NouncillorsArt art;
     SVGRenderer renderer;
 
     function setUp() public {
         renderer = new SVGRenderer();
-        descriptor = new NouncillorsDescriptorV2(INouncillorsArt(address(0)), renderer);
+        descriptor = new NouncillorsDescriptor(INouncillorsArt(address(0)), renderer);
         art = new NouncillorsArt(address(descriptor), new Inflator());
         descriptor.setArt(art);
     }
@@ -94,7 +93,7 @@ contract NouncillorsDescriptorV2Test is Test {
     }
 
     function testToggleDataURIWorks() public {
-        descriptor.setBaseURI('https://nouns.wtf/');
+        descriptor.setBaseURI('https://nouncil.wtf/');
         _makeArtGettersNotRevert();
         vm.mockCall(
             address(renderer),
@@ -103,11 +102,11 @@ contract NouncillorsDescriptorV2Test is Test {
         );
 
         descriptor.toggleDataURIEnabled();
-        assertEq(descriptor.tokenURI(42, INouncillorsSeeder.Seed(0, 0, 0, 0, 0)), 'https://nouns.wtf/42');
+        assertEq(descriptor.tokenURI(42, INouncillorsSeeder.Seed(0, 0, 0, 0, 0)), 'https://nouncil.wtf/42');
 
         descriptor.toggleDataURIEnabled();
         assertEq(
-            descriptor.tokenURI(42, INounsSeeder.Seed(0, 0, 0, 0, 0)),
+            descriptor.tokenURI(42, [0, 0, 0, 0, 0]),
             string(
                 abi.encodePacked(
                     'data:application/json;base64,',
@@ -115,9 +114,9 @@ contract NouncillorsDescriptorV2Test is Test {
                         bytes(
                             abi.encodePacked(
                                 '{"name":"',
-                                'Noun 42',
+                                'Nouncillor 42',
                                 '", "description":"',
-                                'Noun 42 is a member of the Nouns DAO',
+                                'Nouncillor 42 is a member of the Nouncil DAO',
                                 '", "image": "',
                                 'data:image/svg+xml;base64,',
                                 Base64.encode(bytes('mock svg')),
@@ -471,12 +470,12 @@ contract NouncillorsDescriptorV2Test is Test {
     }
 }
 
-contract NouncillorsDescriptorV2WithRealArtTest is DeployUtils {
+contract NouncillorsDescriptorWithRealArtTest is DeployUtils {
     using strings for *;
     using stdJson for string;
     using Base64 for string;
 
-    NouncillorsDescriptorV2 descriptor;
+    NouncillorsDescriptor descriptor;
 
     function setUp() public {
         descriptor = _deployAndPopulateV2();
@@ -485,15 +484,15 @@ contract NouncillorsDescriptorV2WithRealArtTest is DeployUtils {
     function testGeneratesValidTokenURI() public {
         string memory uri = descriptor.tokenURI(
             0,
-            INouncillorsSeeder.Seed({ background: 0, body: 0, accessory: 0, head: 0, glasses: 0 })
+            [0,0,0,0]
         );
 
         string memory json = string(removeDataTypePrefix(uri).decode());
         string memory imageDecoded = string(removeDataTypePrefix(json.readString('.image')).decode());
         strings.slice memory imageSlice = imageDecoded.toSlice();
 
-        assertEq(json.readString('.name'), 'Noun 0');
-        assertEq(json.readString('.description'), 'Noun 0 is a member of the Nouns DAO');
+        assertEq(json.readString('.name'), 'Nouncillor 0');
+        assertEq(json.readString('.description'), 'Nouncillor 0 is a member of the Nouncil DAO');
         assertEq(bytes(imageDecoded).length, 6849);
         assertTrue(
             imageSlice.startsWith(

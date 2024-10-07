@@ -30,7 +30,6 @@
 // - `delegates` is a public function that uses the `_delegates` mapping look-up, but unlike
 //   Comp.sol, returns the delegator's own address if there is no delegate.
 //   This avoids the delegator needing to "delegate to self" with an additional transaction
-// - `_transferTokens()` is renamed `_beforeTokenTransfer()` and adapted to hook into OpenZeppelin's ERC721 hooks.
 
 pragma solidity ^0.8.20;
 
@@ -88,21 +87,6 @@ abstract contract ERC721Checkpointable is ERC721Enumerable {
     function delegates(address delegator) public view returns (address) {
         address current = _delegates[delegator];
         return current == address(0) ? delegator : current;
-    }
-
-    /**
-     * @notice Adapted from `_transferTokens()` in `Comp.sol` to update delegate votes.
-     * @dev hooks into OpenZeppelin's `ERC721._transfer`
-     */
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override {
-        super._beforeTokenTransfer(from, to, tokenId);
-
-        /// @notice Differs from `_transferTokens()` to use `delegates` override method to simulate auto-delegation
-        _moveDelegates(delegates(from), delegates(to), 1);
     }
 
     /**

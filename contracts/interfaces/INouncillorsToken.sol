@@ -33,8 +33,6 @@ interface INouncillorsToken is IERC721 {
 
     event NouncillorBurned(uint256 indexed tokenId);
 
-    event NouncilDAOUpdated(address nounsDAO);
-
     event DescriptorUpdated(INouncillorsDescriptorMinimal descriptor);
 
     event DescriptorLocked();
@@ -60,8 +58,6 @@ interface INouncillorsToken is IERC721 {
     function burn(uint256 tokenId) external;
 
     function dataURI(uint256 tokenId) external returns (string memory);
-
-    function setNouncilDAO(address nouncilDAO);
 
     function setDescriptor(INouncillorsDescriptorMinimal descriptor) external;
 

@@ -15,3 +15,8 @@ lib/
 # solidity-coverage files
 /coverage
 /coverage.json
+
+# Foundry build and cache directories
+foundry-out/
+foundry-cache/
+

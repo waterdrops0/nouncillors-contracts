@@ -62,7 +62,7 @@ pragma solidity ^0.8.6;
 
 import './NouncilDAOInterfaces.sol';
 
-contract NouncilDAOLogicV1 is NouncilDAOStorageV1, NouncilDAOEvents {
+contract NouncilDAOLogic is NouncilDAOStorageV1, NouncilDAOEvents {
     /// @notice The name of this contract
     string public constant name = 'Nouncil DAO';
 
