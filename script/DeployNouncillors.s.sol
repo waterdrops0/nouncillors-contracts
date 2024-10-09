@@ -11,7 +11,7 @@ import "../contracts/Inflator.sol";
 import "../contracts/SVGRenderer.sol";
 import '@openzeppelin/contracts/metatx/ERC2771Forwarder.sol';
 import "../contracts/governance/NouncilDAOProxy.sol";
-import "../contracts/governance/NouncilDAOLogicV1.sol";
+import "../contracts/governance/NouncilDAOLogic.sol";
 import "../contracts/governance/NouncilDAOExecutor.sol";
 
 contract DeployNouncilProtocol is Script {

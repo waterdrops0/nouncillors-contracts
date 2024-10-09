@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
-import { NouncillorsDescriptorV2 } from '../../contracts/NouncillorsDescriptor.sol';
+import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
 import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
@@ -29,7 +29,7 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         assertEq(nouncillorsToken.name(), 'Nouncillors');
     }
 
-    function testMintANounToSelfAndRewardsNoundersDao() public {
+    function testMintANouncillorToSelfAndRewardsNoundersDao() public {
         vm.prank(minter);
         nouncillorsToken.mint();
 

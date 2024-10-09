@@ -8,14 +8,14 @@ import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
 import { ISVGRenderer } from '../../contracts/interfaces/ISVGRenderer.sol';
 import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
 import { INouncillorsArt } from '../../contracts/interfaces/INouncillorsArt.sol';
-import { Base64 } from 'base64-sol/base64.sol';
+import { Base64 } from '../../lib/base64/base64.sol';
 import { Inflator } from '../../contracts/Inflator.sol';
 import { IInflator } from '../../contracts/interfaces/IInflator.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
 import { strings } from './lib/strings.sol';
 
 contract NouncillorsDescriptorTest is Test {
-    NouncillorsDescriptorV2 descriptor;
+    NouncillorsDescriptor descriptor;
     NouncillorsArt art;
     SVGRenderer renderer;
 

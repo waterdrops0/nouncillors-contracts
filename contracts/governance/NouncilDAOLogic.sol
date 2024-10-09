@@ -16,7 +16,7 @@
  *********************************/
 
 // LICENSE
-// NouncilDAOLogicV1.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
+// NouncilDAOLogic.sol is a modified version of Compound Lab's GovernorBravoDelegate.sol:
 // https://github.com/compound-finance/compound-protocol/blob/b9b14038612d846b83f8a009a82c38974ff2dcfe/contracts/Governance/GovernorBravoDelegate.sol
 //
 // GovernorBravoDelegate.sol source code Copyright 2020 Compound Labs, Inc. licensed under the BSD-3-Clause license.
@@ -25,7 +25,7 @@
 // Additional conditions of BSD-3-Clause can be found here: https://opensource.org/licenses/BSD-3-Clause
 //
 // MODIFICATIONS
-// NouncilDAOLogicV1 adds:
+// NouncilDAOLogic adds:
 // - Proposal Threshold basis points instead of fixed number
 //   due to the Nouncillors token's increasing supply
 //
