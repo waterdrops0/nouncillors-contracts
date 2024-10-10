@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
+import { INouncillorsToken } from '../../contracts/interfaces/INouncillorsToken.sol';
 import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
@@ -12,13 +13,9 @@ import { DeployUtils } from './helpers/DeployUtils.sol';
 contract NouncillorsTokenTest is Test, DeployUtils {
     NouncillorsToken nouncillorsToken;
     address owner = address(1);
-    address minter = address(2);
 
     function setUp() public {
-        NouncillorsDescriptorV2 descriptor = _deployAndPopulateV2();
-        _populateDescriptorV2(descriptor);
-
-        nouncillorsToken = new NouncillorsToken(owner, minter, descriptor, IProxyRegistry(address(0)));
+        nouncillorsToken = deployToken(owner);
     }
 
     function testSymbol() public {
@@ -29,16 +26,32 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         assertEq(nouncillorsToken.name(), 'Nouncillors');
     }
 
-    function testMintANouncillorToSelfAndRewardsNoundersDao() public {
-        vm.prank(minter);
-        nouncillorsToken.mint();
+    function testMintANouncillorToSelf() public {
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
+        vm.prank(owner);
+        nouncillorsToken.mint_new(seed, address(this));
 
         assertEq(nouncillorsToken.ownerOf(0), owner);
-        assertEq(nouncillorsToken.ownerOf(1), minter);
     }
 
     function testRevertsOnNotMinterMint() public {
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
         vm.expectRevert('Sender is not the minter');
-        nouncillorsToken.mint();
+
+        nouncillorsToken.mint_new(seed, address(2));
     }
 }

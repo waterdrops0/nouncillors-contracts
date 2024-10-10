@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import { NouncilDAOLogic } from '../../../contracts/governance/NouncilDAOLogic.sol';
 import { NouncillorsDescriptor } from '../../../contracts/NouncillorsDescriptor.sol';
 import { NouncillorsToken } from '../../../contracts/NouncillorsToken.sol';
+import { INouncillorsToken } from '../../../contracts/interfaces/INouncillorsToken.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncilDAOExecutor } from '../../../contracts/governance/NouncilDAOExecutor.sol';
 import { DeployUtils } from './DeployUtils.sol';
@@ -16,26 +17,12 @@ abstract contract NouncilDAOLogicSharedBaseTest is Test, DeployUtils {
     NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(1), TIMELOCK_DELAY);
     address vetoer = address(0x3);
     address admin = address(0x4);
-    address minter = address(0x6);
+    address nouncilDAO = address(0x6);
     address proposer = address(0x7);
     uint256 votingPeriod = 7200;
     uint256 votingDelay = 1;
     uint256 proposalThresholdBPS = 200;
     Utils utils;
-
-    function setUp() public virtual {
-        NouncillorsDescriptor descriptor = _deployAndPopulate();
-        nouncillorsToken = new NouncillorsToken(minter, descriptor, IProxyRegistry(address(0)));
-
-        daoProxy = deployDAOProxy(address(timelock), address(nouncillorsToken));
-
-        vm.prank(address(timelock));
-        timelock.setPendingAdmin(address(daoProxy));
-        vm.prank(address(daoProxy));
-        timelock.acceptAdmin();
-
-        utils = new Utils();
-    }
 
     function deployDAOProxy(
         address timelock,
@@ -75,10 +62,19 @@ abstract contract NouncilDAOLogicSharedBaseTest is Test, DeployUtils {
     }
 
     function mint(address to, uint256 amount) internal {
-        vm.startPrank(minter);
+
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
+        vm.startPrank(nouncilDAO);
         for (uint256 i = 0; i < amount; i++) {
-            uint256 tokenId = nouncillorsToken.mint();
-            nouncillorsToken.transferFrom(minter, to, tokenId);
+            uint256 tokenId = nouncillorsToken.mint_new(seed, address(this));
+            nouncillorsToken.transferFrom(nouncilDAO, to, tokenId);
         }
         vm.stopPrank();
         vm.roll(block.number + 1);

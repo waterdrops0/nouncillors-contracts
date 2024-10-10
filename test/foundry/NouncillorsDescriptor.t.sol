@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import 'forge-std/Test.sol';
 import 'forge-std/StdJson.sol';
 import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol';
+import { INouncillorsToken } from '../../contracts/interfaces/INouncillorsToken.sol';
 import { SVGRenderer } from '../../contracts/SVGRenderer.sol';
 import { ISVGRenderer } from '../../contracts/interfaces/ISVGRenderer.sol';
 import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
@@ -21,7 +22,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function setUp() public {
         renderer = new SVGRenderer();
-        descriptor = new NouncillorsDescriptor(INouncillorsArt(address(0)), renderer);
+        descriptor = new NouncillorsDescriptor(address(this), INouncillorsArt(address(0)), renderer);
         art = new NouncillorsArt(address(descriptor), new Inflator());
         descriptor.setArt(art);
     }
@@ -101,12 +102,20 @@ contract NouncillorsDescriptorTest is Test {
             abi.encode('mock svg')
         );
 
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
         descriptor.toggleDataURIEnabled();
-        assertEq(descriptor.tokenURI(42, INouncillorsSeeder.Seed(0, 0, 0, 0, 0)), 'https://nouncil.wtf/42');
+        assertEq(descriptor.tokenURI(42, seed), 'https://nouncil.wtf/42');
 
         descriptor.toggleDataURIEnabled();
         assertEq(
-            descriptor.tokenURI(42, [0, 0, 0, 0, 0]),
+            descriptor.tokenURI(42, seed),
             string(
                 abi.encodePacked(
                     'data:application/json;base64,',
@@ -444,7 +453,16 @@ contract NouncillorsDescriptorTest is Test {
         vm.mockCall(address(art), abi.encodeWithSelector(INouncillorsArt.glasses.selector), abi.encode('the glasses'));
         vm.mockCall(address(art), abi.encodeWithSelector(INouncillorsArt.palettes.selector), abi.encode('the palette'));
 
-        ISVGRenderer.Part[] memory parts = descriptor.getPartsForSeed(INouncillorsSeeder.Seed(0, 0, 0, 0, 0));
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
+
+        ISVGRenderer.Part[] memory parts = descriptor.getPartsForSeed(seed);
 
         assertEq(parts[0].image, 'the body');
         assertEq(parts[0].palette, 'the palette');
@@ -478,13 +496,22 @@ contract NouncillorsDescriptorWithRealArtTest is DeployUtils {
     NouncillorsDescriptor descriptor;
 
     function setUp() public {
-        descriptor = _deployAndPopulateV2();
+        descriptor = _deployAndPopulateDescriptor();
     }
 
     function testGeneratesValidTokenURI() public {
+
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+        background: 0,
+        body: 0,
+        accessory: 0,
+        head: 0,
+        glasses: 0
+        });
+
         string memory uri = descriptor.tokenURI(
             0,
-            [0,0,0,0]
+            seed
         );
 
         string memory json = string(removeDataTypePrefix(uri).decode());

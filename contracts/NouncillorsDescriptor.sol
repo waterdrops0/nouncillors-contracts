@@ -394,7 +394,7 @@ contract NouncillorsDescriptor is INouncillorsDescriptor, Ownable {
     }
 
     /**
-     * @notice Given a token ID and seed, construct a token URI for an official Nouncil Nouncillor.
+     * @notice Given a token ID and seed, construct a token URI for an official Nouncillor.
      * @dev The returned value may be a base64 encoded data URI or an API URL.
      */
     function tokenURI(uint256 tokenId, INouncillorsToken.Seed memory seed) external view override returns (string memory) {

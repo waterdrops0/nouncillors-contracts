@@ -24,32 +24,40 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
     uint32 constant UPDATABLE_PERIOD_BLOCKS = 10;
 
     function _deployAndPopulateDescriptor() internal returns (NouncillorsDescriptor) {
-        NouncillorsDescriptor descriptor = new NouncillorsDescriptor();
-        _populateDescriptor(descriptor);
-        return descriptor;
-    }
-
-    function _deployAndPopulate() internal returns (NouncillorsDescriptor) {
         NouncillorsDescriptor descriptor = _deployDescriptor();
-        _populateDescriptorV2(descriptor);
+        _populateDescriptor(descriptor);
         return descriptor;
     }
 
     function _deployDescriptor() internal returns (NouncillorsDescriptor) {
         SVGRenderer renderer = new SVGRenderer();
         Inflator inflator = new Inflator();
-        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(NouncillorsArt(address(0)), renderer);
-        NouncillorsArt art = new NouncillorsArt(address(descriptor), inflator);
+        NouncillorsArt art = new NouncillorsArt(address(0), inflator);
+
+        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(address(this), art, renderer);
         descriptor.setArt(art);
         return descriptor;
     }
 
-    function deployToken(address nouncilDAO, address minter) internal returns (NouncillorsToken nouncillorsToken) {
+    function deployToken(address nouncilDAO) internal returns (NouncillorsToken nouncillorsToken) {
         IProxyRegistry proxyRegistry = IProxyRegistry(address(3));
-        NouncillorsDescriptor descriptor = _deployAndPopulate();
+        NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
 
-        nouncillorsToken = new NouncillorsToken(nouncilDAO, minter, descriptor);
+        string memory tokenName = "Nouncillors";
+        string memory tokenSymbol = "NCL";
+        address trustedForwarder = address(0); 
+
+        nouncillorsToken = new NouncillorsToken(
+            nouncilDAO,         // initialOwner
+            tokenName,          // name
+            tokenSymbol,        // symbol
+            trustedForwarder,   // trustedForwarder
+            descriptor          // descriptor
+        );
+
+        return nouncillorsToken;
     }
+
 
     function get1967Implementation(address proxy) internal view returns (address) {
         bytes32 slot = bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1);

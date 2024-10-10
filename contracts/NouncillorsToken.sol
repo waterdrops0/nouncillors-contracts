@@ -181,16 +181,17 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
         return _mintTo(sender, _currentNouncillorId++, _seed);
     }
 
-        /**
+    /**
     * @notice Mints a new token to the specified address with the provided seed.
     * @dev Can only be called by the contract owner.
     * @param _seed The seed data to be associated with the minted Nouncillor NFT.
     * @param recipient The address to mint the token to.
+    * @return The ID of the newly minted token.
     */
-    function mint_new(Seed calldata _seed, address recipient) external onlyOwner {
+    function mint_new(Seed calldata _seed, address recipient) external onlyOwner returns (uint256) {
         require(recipient != address(0), "Cannot mint to the zero address");
 
-        // Revert if the sender has already minted
+        // Revert if the recipient has already minted
         if (hasMinted[recipient]) {
             revert AlreadyClaimed();
         }
@@ -218,10 +219,14 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
             revert InvalidSeedTrait("glasses", _seed.glasses, glassesCount);
         }
 
-        // Mark as minted and proceed to mint the token
+        // Mark the recipient as having minted
         hasMinted[recipient] = true;
-        _mintTo(recipient, _currentNouncillorId++, _seed);
+
+        // Mint the token and return the new token ID
+        uint256 newTokenId = _mintTo(recipient, _currentNouncillorId++, _seed);
+        return newTokenId;
     }
+
 
    /**
      * @notice Burn a nouncillor.

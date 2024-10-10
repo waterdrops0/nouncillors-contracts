@@ -11,10 +11,21 @@ import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.
 import { NouncilDAOExecutor } from '../../contracts/governance/NouncilDAOExecutor.sol';
 import { NouncilDAOLogicSharedBaseTest } from './helpers/NouncilDAOLogicSharedBaseTest.sol';
 
-abstract contract NouncilDAOLogicStateTest is NouncilDAOLogicSharedBaseTest {
-    function setUp() public override {
-        super.setUp();
 
+abstract contract NouncilDAOLogicStateTest is NouncilDAOLogicSharedBaseTest {
+    function setUp() public {
+
+        NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
+        nouncillorsToken = deployToken(nouncilDAO);
+
+        daoProxy = deployDAOProxy(address(timelock), address(nouncillorsToken));
+
+        vm.prank(address(timelock));
+        timelock.setPendingAdmin(address(daoProxy));
+        vm.prank(address(daoProxy));
+        timelock.acceptAdmin();
+
+   
         mint(proposer, 1);
 
         vm.roll(block.number + 1);
@@ -169,32 +180,5 @@ abstract contract NouncilDAOLogicStateTest is NouncilDAOLogicSharedBaseTest {
 
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
         assertTrue(daoProxy.state(proposalId) == NouncilDAOStorageV1.ProposalState.Executed);
-    }
-}
-
-contract NouncilDAOLogicV1StateTest is NouncilDAOLogicStateTest {
-    function daoVersion() internal pure override returns (uint256) {
-        return 1;
-    }
-
-    function deployDAOProxy() internal override returns (NouncilDAOLogic) {
-        NouncilDAOLogic daoLogic = new NouncilDAOLogic();
-
-        return
-            NouncilDAOLogic(
-                payable(
-                    new NouncilDAOProxy(
-                        address(timelock),
-                        address(nouncillorsToken),
-                        vetoer,
-                        admin,
-                        address(daoLogic),
-                        votingPeriod,
-                        votingDelay,
-                        proposalThresholdBPS,
-                        1000
-                    )
-                )
-            );
     }
 }
