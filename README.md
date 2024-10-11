@@ -19,23 +19,6 @@ Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO
 | NouncilDAOLogic.sol         |                                            |                                                                                                 |
 | NouncilDAOExecutor.sol      |                                            |                                                                                                 |
 
-## Main Features
-
-- Gasless Minting
-- Onchain Art
-- Dynamic Whitelisting
-- Non-Transferability
-
-## Feel absolutely free to:
-
-- Fork the Repository
-- Submit Pull Requests
-- Open Issues for Discussion
-
-### Contributions and Suggestions
-
-Any contribution is welcome and greatly appreciated. ⌐◨-◨
-
 ## Usage
 
 ### Build
@@ -62,3 +45,13 @@ forge script script/Deploy.s.sol --rpc-url <your_rpc_url> --private-key <your_pr
 ```
 
 Make sure to replace `<your_rpc_url>` and `<your_private_key>` with your actual RPC URL and private key values.
+
+### Contributions and Suggestions
+
+Any contribution is welcome and greatly appreciated. ⌐◨-◨
+
+## Feel absolutely free to:
+
+- Fork the Repository
+- Submit Pull Requests
+- Open Issues for Discussion
