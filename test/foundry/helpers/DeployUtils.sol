@@ -5,10 +5,12 @@ import 'forge-std/Test.sol';
 import { DescriptorHelpers } from './DescriptorHelpers.sol';
 import { NouncillorsDescriptor } from '../../../contracts/NouncillorsDescriptor.sol';
 import { NouncilDAOExecutor } from '../../../contracts/governance/NouncilDAOExecutor.sol';
+import { NouncilDAOLogic } from '../../../contracts/governance/NouncilDAOLogic.sol';
+import { NouncilDAOProxy } from '../../../contracts/governance/NouncilDAOProxy.sol';
+import { ERC1967Proxy } from '@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncillorsToken } from '../../../contracts/NouncillorsToken.sol';
-
-
+import { NouncilDAOStorageV1 } from '../../../contracts/governance/NouncilDAOInterfaces.sol';
 
 abstract contract DeployUtils is Test, DescriptorHelpers {
     uint256 constant TIMELOCK_DELAY = 2 days;
@@ -27,7 +29,7 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         return descriptor;
     }
 
-    function deployToken(address nouncilDAO) internal returns (NouncillorsToken nouncillorsToken) {
+    function deployToken(address initialOwner) internal returns (NouncillorsToken nouncillorsToken) {
         IProxyRegistry proxyRegistry = IProxyRegistry(address(3));
         NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
 
@@ -36,7 +38,7 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         address trustedForwarder = address(0); 
 
         nouncillorsToken = new NouncillorsToken(
-            nouncilDAO,         // initialOwner
+            initialOwner,       // initialOwner
             tokenName,          // name
             tokenSymbol,        // symbol
             trustedForwarder,   // trustedForwarder
@@ -44,6 +46,56 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         );
 
         return nouncillorsToken;
+    }
+
+    struct NouncilDAOParams {
+        uint256 votingPeriod;
+        uint256 votingDelay;
+        uint256 proposalThresholdBPS;
+        uint256 quorumVotesBPS;
+        address timelock;
+        address admin;
+        address implementation;
+    }
+
+    function _deployDAOWithParams() internal returns (NouncilDAOLogic) {
+        NouncilDAOExecutor timelock;
+        NouncillorsToken nouncillorsToken;
+
+        timelock = NouncilDAOExecutor(payable(address(new ERC1967Proxy(address(new NouncilDAOExecutor(address(1), TIMELOCK_DELAY)), ''))));
+
+        nouncillorsToken = deployToken(makeAddr('initialOwner'));
+
+        nouncillorsToken.transferOwnership(address(timelock));
+
+        address daoLogicImplementation = address(new NouncilDAOLogic());
+
+        NouncilDAOLogic dao = NouncilDAOLogic(
+            payable(
+                new NouncilDAOProxy(
+                    address(timelock),
+                    address(nouncillorsToken),
+                    makeAddr('vetoer'),
+                    address(this),
+                    daoLogicImplementation,
+                    VOTING_PERIOD,
+                    VOTING_DELAY,
+                    PROPOSAL_THRESHOLD,
+                    QUORUM_VOTES_BPS
+                )
+            )
+        );
+
+        vm.prank(address(timelock));
+        timelock.setPendingAdmin(address(dao));
+        vm.prank(address(dao));
+        timelock.acceptAdmin();
+
+        return dao;
+    }
+
+    function _deployDAO() internal returns (NouncilDAOLogic) {
+        return _deployDAOWithParams();
     }
 
     function get1967Implementation(address proxy) internal view returns (address) {
