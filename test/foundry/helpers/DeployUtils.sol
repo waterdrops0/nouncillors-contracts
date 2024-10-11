@@ -4,12 +4,10 @@ pragma solidity ^0.8.19;
 import 'forge-std/Test.sol';
 import { DescriptorHelpers } from './DescriptorHelpers.sol';
 import { NouncillorsDescriptor } from '../../../contracts/NouncillorsDescriptor.sol';
-import { SVGRenderer } from '../../../contracts/SVGRenderer.sol';
-import { NouncillorsArt } from '../../../contracts/NouncillorsArt.sol';
 import { NouncilDAOExecutor } from '../../../contracts/governance/NouncilDAOExecutor.sol';
 import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncillorsToken } from '../../../contracts/NouncillorsToken.sol';
-import { Inflator } from '../../../contracts/Inflator.sol';
+
 
 
 abstract contract DeployUtils is Test, DescriptorHelpers {
@@ -26,16 +24,6 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
     function _deployAndPopulateDescriptor() internal returns (NouncillorsDescriptor) {
         NouncillorsDescriptor descriptor = _deployDescriptor();
         _populateDescriptor(descriptor);
-        return descriptor;
-    }
-
-    function _deployDescriptor() internal returns (NouncillorsDescriptor) {
-        SVGRenderer renderer = new SVGRenderer();
-        Inflator inflator = new Inflator();
-        NouncillorsArt art = new NouncillorsArt(address(0), inflator);
-
-        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(address(this), art, renderer);
-        descriptor.setArt(art);
         return descriptor;
     }
 
@@ -57,7 +45,6 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
 
         return nouncillorsToken;
     }
-
 
     function get1967Implementation(address proxy) internal view returns (address) {
         bytes32 slot = bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1);

@@ -3,6 +3,9 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { NouncillorsDescriptor } from '../../../contracts/NouncillorsDescriptor.sol';
+import { SVGRenderer } from '../../../contracts/SVGRenderer.sol';
+import { NouncillorsArt } from '../../../contracts/NouncillorsArt.sol';
+import { Inflator } from '../../../contracts/Inflator.sol';
 import { Constants } from './Constants.sol';
 import { strings } from '../lib/strings.sol';
 
@@ -10,6 +13,16 @@ abstract contract DescriptorHelpers is Test, Constants {
     using strings for string;
     using strings for strings.slice;
 
+    function _deployDescriptor() internal returns (NouncillorsDescriptor) {
+        SVGRenderer renderer = new SVGRenderer();
+        Inflator inflator = new Inflator();
+        NouncillorsArt art = new NouncillorsArt(address(0), inflator);
+
+        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(address(this), art, renderer);
+        descriptor.setArt(art);
+        return descriptor;
+    }
+    
     function _populateDescriptor(NouncillorsDescriptor descriptor) internal {
         // created with `npx hardhat descriptor-art-to-console`
         (bytes memory palette, string[] memory backgrounds) = abi.decode(

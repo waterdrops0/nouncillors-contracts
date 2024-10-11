@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
-import 'forge-std/Test.sol';
 import { NouncilDAOLogic } from '../../contracts/governance/NouncilDAOLogic.sol';
 import { NouncilDAOProxy } from '../../contracts/governance/NouncilDAOProxy.sol';
 import { NouncilDAOStorageV1 } from '../../contracts/governance/NouncilDAOInterfaces.sol';
@@ -9,10 +8,10 @@ import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol
 import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncilDAOExecutor } from '../../contracts/governance/NouncilDAOExecutor.sol';
-import { NouncilDAOLogicSharedBaseTest } from './helpers/NouncilDAOLogicSharedBaseTest.sol';
+import { NouncilDAOLogicHelpers } from './helpers/NouncilDAOLogicHelpers.sol';
 
 
-abstract contract NouncilDAOLogicStateTest is NouncilDAOLogicSharedBaseTest {
+abstract contract NouncilDAOLogicStateTest is NouncilDAOLogicHelpers {
     function setUp() public {
 
         NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
