@@ -36,6 +36,8 @@ Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO
 
 Any contribution is welcome and greatly appreciated. ⌐◨-◨
 
+## Usage
+
 ### Build
 To build the project, run:
 ```shell
