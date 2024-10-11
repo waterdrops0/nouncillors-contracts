@@ -21,7 +21,7 @@ Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO
 | NouncilDAOLogic.sol         |                                            |                                                                                                 |
 | NouncilDAOExecutor.sol      |                                            |                                                                                                 |
 
-## Key Features
+## Main Features
 
 - Gasless Minting
 - Onchain Art
