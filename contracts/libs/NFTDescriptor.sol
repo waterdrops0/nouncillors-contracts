@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.20;
 
-import '../../lib/base64/base64.sol';
+import 'base64-sol/base64.sol';
 import '../interfaces/ISVGRenderer.sol';
 
 library NFTDescriptor {
