@@ -3,6 +3,9 @@ node_modules
 
 README.md
 
+broadcast/
+.github/
+
 # Foundry files
 lib/
 

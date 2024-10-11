@@ -33,25 +33,8 @@ To run tests, use:
 forge test
 ```
 
-### Deploy
-1. Deploy the NFTDescriptor library and note its deployed address.
-2. Update `foundry.toml` in the `[libraries]` section with the NFTDescriptor address to properly link it.
-3. Re-compile your contracts to ensure correct linking.
-4. Deploy the NouncillorsDescriptor contract and other contracts:
-
-```shell
-forge script script/DeployNFTDescriptor.s.sol --rpc-url <your_rpc_url> --private-key <your_private_key>
-forge script script/Deploy.s.sol --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-Make sure to replace `<your_rpc_url>` and `<your_private_key>` with your actual RPC URL and private key values.
-
 ### Contributions and Suggestions
 
 Any contribution is welcome and greatly appreciated. ⌐◨-◨
 
-## Feel absolutely free to:
 
-- Fork the Repository
-- Submit Pull Requests
-- Open Issues for Discussion
