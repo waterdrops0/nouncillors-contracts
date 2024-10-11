@@ -28,7 +28,7 @@ Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO
 - Dynamic Whitelisting
 - Non-Transferability
 
-## Feel free to:
+## Feel aboslutely free to:
 
 - Fork the Repository
 - Submit Pull Requests
