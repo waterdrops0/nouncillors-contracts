@@ -4,6 +4,8 @@
 
 ## Smart Contract Overview
 
+Nouncil Protocol is a collection of smart contracts designed to issue and manage non-fungible, non-transferable membership tokens.
+
 Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO.
 
 ## Contracts
