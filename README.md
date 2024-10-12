@@ -2,8 +2,6 @@
 
 ## Smart Contract Overview
 
-Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO.
-
 ## Contracts
 
 | Name                        | Address                                    | Sepoliascan                                                                                     |
@@ -33,6 +31,6 @@ forge test
 
 ### Contributions and Suggestions
 
-Any contribution is welcome and greatly appreciated. ⌐◨-◨
+Any contribution is welcome and greatly appreciated. 🏗️⌐◨-◨
 
 
