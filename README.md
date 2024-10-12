@@ -21,13 +21,11 @@ Nouncil Protocol is comprised of two primary components: Nouncillors and the DAO
 
 ## Usage
 
-### Build
 To build the project, run:
 ```shell
 forge build
 ```
 
-### Test
 To run tests, use:
 ```shell
 forge test
