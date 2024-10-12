@@ -4,18 +4,19 @@
 
 ## Contracts
 
-| Name                        | Address                                    | Sepoliascan                                                                                     |
-|-----------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------|
-| NouncillorsToken.sol        | 0x95745bB31eEb8278967f5E450dc8B31D34b02733 | https://sepolia.etherscan.io/address/0x95745bB31eEb8278967f5E450dc8B31D34b02733                  |
-| NouncillorsDescriptor.sol   |                                            |                                                                                                 |
-| NFTDescriptor.sol           |                                            |                                                                                                 |
-| NouncillorsArt.sol          |                                            |                                                                                                 |
-| Inflator.sol                |                                            |                                                                                                 |
-| SVGRenderer.sol             |                                            |                                                                                                 |
-| ERC2771Forwarder.sol        |                                            |                                                                                                 |
-| NouncilDAOProxy.sol         |                                            |                                                                                                 |
-| NouncilDAOLogic.sol         |                                            |                                                                                                 |
-| NouncilDAOExecutor.sol      |                                            |                                                                                                 |
+| Name                        | Sepoliascan                                                                                     | Etherscan |
+|-----------------------------|-------------------------------------------------------------------------------------------------|-----------|
+| NouncillorsToken.sol        | https://sepolia.etherscan.io/address/0x95745bB31eEb8278967f5E450dc8B31D34b02733                  |           |
+| NouncillorsDescriptor.sol   |                                                                                                 |           |
+| NFTDescriptor.sol           |                                                                                                 |           |
+| NouncillorsArt.sol          |                                                                                                 |           |
+| Inflator.sol                |                                                                                                 |           |
+| SVGRenderer.sol             |                                                                                                 |           |
+| ERC2771Forwarder.sol        |                                                                                                 |           |
+| NouncilDAOProxy.sol         |                                                                                                 |           |
+| NouncilDAOLogic.sol         |                                                                                                 |           |
+| NouncilDAOExecutor.sol      |                                                                                                 |           |
+
 
 ## Usage
 
