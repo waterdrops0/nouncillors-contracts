@@ -16,10 +16,16 @@ abstract contract DescriptorHelpers is Test, Constants {
     function _deployDescriptor() internal returns (NouncillorsDescriptor) {
         SVGRenderer renderer = new SVGRenderer();
         Inflator inflator = new Inflator();
-        NouncillorsArt art = new NouncillorsArt(address(0), inflator);
 
-        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(address(this), art, renderer);
+        // Step 1: Deploy descriptor with a placeholder art address
+        NouncillorsDescriptor descriptor = new NouncillorsDescriptor(address(this), NouncillorsArt(address(0)), renderer);
+
+        // Step 2: Deploy art with the descriptor's address
+        NouncillorsArt art = new NouncillorsArt(address(descriptor), inflator);
+
+        // Step 3: Update the descriptor with the correct art address
         descriptor.setArt(art);
+
         return descriptor;
     }
     

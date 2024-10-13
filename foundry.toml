@@ -4,6 +4,7 @@ libs = ['lib', '../../node_modules']
 cache_path = 'foundry-cache'
 out = 'foundry-out'
 fs_permissions = [{ access = "read", path = "./"}]
+ffi = true
 
 [profile.lite]
 optimizer = false

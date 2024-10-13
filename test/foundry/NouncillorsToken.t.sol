@@ -14,12 +14,15 @@ contract NouncillorsTokenTest is Test, DeployUtils {
     NouncillorsToken nouncillorsToken;
     address owner = address(1);
 
+    // Custom error from OpenZeppelin's Ownable.sol that can't be called from the ABI of NouncillorsToken.sol
+    error OwnableUnauthorizedAccount(address account);
+
     function setUp() public {
         nouncillorsToken = deployToken(owner);
     }
 
     function testSymbol() public {
-        assertEq(nouncillorsToken.symbol(), 'NOUNC');
+        assertEq(nouncillorsToken.symbol(), 'NCL');
     }
 
     function testName() public {
@@ -36,7 +39,7 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         });
 
         vm.prank(owner);
-        nouncillorsToken.mint_new(seed, address(this));
+        nouncillorsToken.mint_new(seed, owner);
 
         assertEq(nouncillorsToken.ownerOf(0), owner);
     }
@@ -50,8 +53,15 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         glasses: 0
         });
 
-        vm.expectRevert('Sender is not the minter');
+        address unauthorized = address(2);
 
-        nouncillorsToken.mint_new(seed, address(2));
+        // Prank with unauthorized address
+        vm.prank(unauthorized);
+
+        // Expect revert from unauthorized address
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, unauthorized));
+
+        // Try to mint
+        nouncillorsToken.mint_new(seed, unauthorized);
     }
 }

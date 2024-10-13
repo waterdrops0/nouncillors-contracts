@@ -15,6 +15,10 @@ import { IInflator } from '../../contracts/interfaces/IInflator.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
 import { strings } from './lib/strings.sol';
 
+
+// Custom error from OpenZeppelin's Ownable.sol that can't be called from the ABI of NouncillorsDescriptor.sol
+error OwnableUnauthorizedAccount(address account);
+
 contract NouncillorsDescriptorTest is Test {
     NouncillorsDescriptor descriptor;
     NouncillorsArt art;
@@ -29,7 +33,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotSetArtIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.setArt(INouncillorsArt(address(2)));
     }
 
@@ -46,7 +50,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotSetRendererIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.setRenderer(ISVGRenderer(address(2)));
     }
 
@@ -63,7 +67,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotSetArtDescriptorIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.setArtDescriptor(address(2));
     }
 
@@ -74,7 +78,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotSetArtInflatorIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.setArtInflator(IInflator(address(2)));
     }
 
@@ -88,9 +92,9 @@ contract NouncillorsDescriptorTest is Test {
     }
 
     function testCannotToggleDataURIIfNotOwner() public {
-        vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
-        descriptor.toggleDataURIEnabled();
+        vm.prank(address(1)); // Simulate a non-owner caller
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1))); // Expect revert with custom error
+        descriptor.toggleDataURIEnabled(); // Function that triggers the error
     }
 
     function testToggleDataURIWorks() public {
@@ -111,11 +115,11 @@ contract NouncillorsDescriptorTest is Test {
         });
 
         descriptor.toggleDataURIEnabled();
-        assertEq(descriptor.tokenURI(42, seed), 'https://nouncil.wtf/42');
+        assertEq(descriptor.tokenURI(0, seed), 'https://nouncil.wtf/0');
 
         descriptor.toggleDataURIEnabled();
         assertEq(
-            descriptor.tokenURI(42, seed),
+            descriptor.tokenURI(0, seed),
             string(
                 abi.encodePacked(
                     'data:application/json;base64,',
@@ -226,7 +230,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotSetPalettePointerIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.setPalettePointer(0, address(42));
     }
 
@@ -246,7 +250,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddBodiesIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addBodies('00', 1, 1);
     }
 
@@ -266,7 +270,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddAccessoriesIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addAccessories('00', 1, 1);
     }
 
@@ -286,7 +290,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddHeadsIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addHeads('00', 1, 1);
     }
 
@@ -306,7 +310,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddGlassesIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addGlasses('00', 1, 1);
     }
 
@@ -329,7 +333,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddBodiesFromPointerIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addBodiesFromPointer(address(1337), 1, 1);
     }
 
@@ -352,7 +356,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddAccessoriesFromPointerIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addAccessoriesFromPointer(address(1337), 1, 1);
     }
 
@@ -375,7 +379,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddHeadsFromPointerIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addHeadsFromPointer(address(1337), 1, 1);
     }
 
@@ -398,7 +402,7 @@ contract NouncillorsDescriptorTest is Test {
 
     function testCannotAddGlassesFromPointerIfNotOwner() public {
         vm.prank(address(1));
-        vm.expectRevert(bytes('Ownable: caller is not the owner'));
+        vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, address(1)));
         descriptor.addGlassesFromPointer(address(1337), 1, 1);
     }
 
@@ -519,7 +523,7 @@ contract NouncillorsDescriptorWithRealArtTest is DeployUtils {
         strings.slice memory imageSlice = imageDecoded.toSlice();
 
         assertEq(json.readString('.name'), 'Nouncillor 0');
-        assertEq(json.readString('.description'), 'Nouncillor 0 is a member of the Nouncil DAO');
+        assertEq(json.readString('.description'), 'Nouncillor 0 is a member of the Nouncil');
         assertEq(bytes(imageDecoded).length, 6849);
         assertTrue(
             imageSlice.startsWith(
