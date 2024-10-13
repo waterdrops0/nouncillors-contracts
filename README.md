@@ -2,10 +2,10 @@
   <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo" width="200">
 </div>
 
-<h2 align="center">Nouncil Protocol</h2>
+<h2 align="center">The Nouncil Protocol</h2>
 
 <p align="center">
-  This repository contains the contracts used by the Nouncil protocol.
+  This repository contains the contracts used in the Nouncil protocol.
 </p>
 
 <h2 align="center">Contracts</h2>
