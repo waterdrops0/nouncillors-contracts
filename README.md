@@ -2,10 +2,10 @@
   <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo" width="300">
 </div>
 
-<h2 align="center">Smart Contract Overview</h2>
+<h2 align="center">Nouncil Protocol</h2>
 
 <p align="center">
-  This repository contains the contracts used in the Nouncillors project. Below is an overview of the contracts with their corresponding Sepolia and Etherscan links.
+  This repository contains the contracts used by the Nouncil protocol. Below is an overview of the contracts with their corresponding Sepolia and Etherscan links.
 </p>
 
 <h2 align="center">Contracts</h2>
