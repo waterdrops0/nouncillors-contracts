@@ -89,4 +89,4 @@
 </pre>
 </div>
 
-<h3 align="center">Any contribution is welcome and greatly appreciated. 🏗️⌐◨-◨</h3>
+<h3 align="center">Any contribution is welcome and appreciated. 🏗️⌐◨-◨</h3>
