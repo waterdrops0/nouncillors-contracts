@@ -5,7 +5,7 @@
 <h2 align="center">Nouncil Protocol</h2>
 
 <p align="center">
-  This repository contains the contracts used by the Nouncil protocol. Below is an overview of the contracts with their corresponding Sepolia and Etherscan links.
+  This repository contains the contracts used by the Nouncil protocol.
 </p>
 
 <h2 align="center">Contracts</h2>
@@ -89,4 +89,4 @@
 </pre>
 </div>
 
-<h3 align="center">Any contribution is welcome and appreciated. 🏗️⌐◨-◨</h3>
+<h3 align="center">️⌐◨-◨</h3>
