@@ -89,8 +89,4 @@
 </pre>
 </div>
 
-<h2 align="center">Contributions and Suggestions</h2>
-
-<p align="center">
-  Any contribution is welcome and greatly appreciated. 🏗️⌐◨-◨
-</p>
+<h2 align="center">Any contribution is welcome and greatly appreciated. 🏗️⌐◨-◨</h2>

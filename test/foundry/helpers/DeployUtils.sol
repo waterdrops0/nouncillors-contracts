@@ -19,9 +19,6 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
     uint256 constant PROPOSAL_THRESHOLD = 1;
     uint256 constant QUORUM_VOTES_BPS = 2000;
 
-    uint32 constant LAST_MINUTE_BLOCKS = 10;
-    uint32 constant OBJECTION_PERIOD_BLOCKS = 10;
-    uint32 constant UPDATABLE_PERIOD_BLOCKS = 10;
 
     function _deployAndPopulateDescriptor() internal returns (NouncillorsDescriptor) {
         NouncillorsDescriptor descriptor = _deployDescriptor();
@@ -58,7 +55,51 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         address implementation;
     }
 
-    function _deployDAOWithParams() internal returns (NouncilDAOLogic) {
+    function _createDAOV3Proxy(
+        address timelock,
+        address nouncillorsToken,
+        address vetoer,
+        NouncilDAOParams memory daoParams
+    ) internal returns (NouncilDAOLogic dao) {
+        dao = NouncilDAOLogic(
+            address(
+                new NouncilDAOProxy(
+                    timelock,
+                    nouncillorsToken,
+                    vetoer,
+                    daoParams.admin,
+                    daoParams.implementation,
+                    daoParams.votingPeriod,
+                    daoParams.votingDelay,
+                    daoParams.proposalThresholdBPS,
+                    daoParams.quorumVotesBPS
+                )
+            )
+        );
+    }
+
+    function _createDAOV3Proxy(
+        address timelock,
+        address nounsToken,
+        address vetoer
+    ) internal returns (NouncilDAOLogic dao) {
+        dao = _createDAOV3Proxy(
+            timelock,
+            nounsToken,
+            vetoer,
+            NouncilDAOParams({
+                votingPeriod: VOTING_PERIOD,
+                votingDelay: VOTING_DELAY,
+                proposalThresholdBPS: PROPOSAL_THRESHOLD,
+                quorumVotesBPS: QUORUM_VOTES_BPS,
+                timelock: timelock,
+                admin: address(this),
+                implementation: address(new NouncilDAOLogic())
+            })
+        );
+    }
+
+    function _deployDAOV3WithParams() internal returns (NouncilDAOLogic) {
         NouncilDAOExecutor timelock;
         NouncillorsToken nouncillorsToken;
 
@@ -94,8 +135,8 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         return dao;
     }
 
-    function _deployDAO() internal returns (NouncilDAOLogic) {
-        return _deployDAOWithParams();
+    function _deployDAOV3() internal returns (NouncilDAOLogic) {
+        return _deployDAOV3WithParams();
     }
 
     function get1967Implementation(address proxy) internal view returns (address) {
