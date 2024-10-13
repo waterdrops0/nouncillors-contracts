@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo" width="300">
+  <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo" width="200">
 </div>
 
 <h2 align="center">Nouncil Protocol</h2>
