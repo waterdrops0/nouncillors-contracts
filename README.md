@@ -2,8 +2,6 @@
   <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo">
 </div>
 
-![Nouncil Logo](https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6)
-
 ## Smart Contract Overview
 
 ## Contracts
