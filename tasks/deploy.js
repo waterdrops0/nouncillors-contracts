@@ -23,8 +23,19 @@ task("deploy", "Deploys the Nouncillors contracts")
     await svgRenderer.waitForDeployment();
     console.log("SVGRenderer deployed to: ", svgRenderer.target)
 
+    // Deploy Inflate
+    const Inflate = await hre.ethers.getContractFactory("Inflate");
+    const inflate = await Inflate.delpoy();
+    await inflate.waitForDeployment();
+    console.log("Inflate deployed to:", await inflate,getAddress());
+
     // Deploy Inflator
-    const Inflator = await hre.ethers.getContractFactory("Inflator");
+    const Inflator = await hre.ethers.getContractFactory("Inflator", {
+      libraries: {
+        Inflate: inflate.target
+      }
+    });
+    
     const inflator = await Inflator.deploy();
     await inflator.waitForDeployment();
     console.log("Inflator deployed to:", await inflator.getAddress());

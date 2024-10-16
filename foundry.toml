@@ -9,8 +9,9 @@ ffi = true
 [profile.lite]
 optimizer = false
 
-# [libraries]
-# NouncillorsDescriptor.sol:NouncillorsDescriptor = "{NFTDescriptor address}"
+[libraries]
+NouncillorsDescriptor = { NFTDescriptor = "0xLibrary1Address" }
+Inflator = { Inflate = "0xLibrary2Address" }
 
 
 
