@@ -11,7 +11,6 @@ import { NouncillorsArt } from '../../contracts/NouncillorsArt.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
 
 contract NouncillorsTokenTest is Test, DeployUtils {
-    NouncillorsToken nouncillorsToken;
     address owner = address(1);
 
     // Custom error from OpenZeppelin's Ownable.sol that can't be called from the ABI of NouncillorsToken.sol

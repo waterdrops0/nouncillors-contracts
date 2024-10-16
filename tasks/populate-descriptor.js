@@ -4,30 +4,18 @@ const { dataToDescriptorInput } = require('./utils');
 
 task('populate-descriptor', 'Populates the descriptor with color palettes and Nouncillor parts')
   .addOptionalParam(
-    'nftDescriptor',
-    'The `NFTDescriptor` contract address',
-    '0x154f7604790ADF3DE783e7202f814BB0A73972Ec',
-  )
-  .addOptionalParam(
     'nouncillorsDescriptor',
     'The `NouncillorsDescriptor` contract address',
-    '0x30DeCB824a37c077e6bFcB0d4393BFD74948A402',
+    '0x682401c50dee3DDB42b23696a2f20817148A6b0a',
   )
-  .setAction(async ({ nftDescriptor, nouncillorsDescriptor }, hre) => {
+  .setAction(async ({ nouncillorsDescriptor }, hre) => {
     const options = { gasLimit: hre.network.name === 'hardhat' ? 30000000 : undefined };
 
-    const descriptorFactory = await hre.ethers.getContractFactory('NouncillorsDescriptor', {
-      libraries: {
-        NFTDescriptor: nftDescriptor,
-      },
-    });
+    const descriptorFactory = await hre.ethers.getContractFactory('NouncillorsDescriptor');
     const descriptorContract = descriptorFactory.attach(nouncillorsDescriptor);
 
     const { bgcolors, palette, images } = ImageData;
     const { bodies, accessories, heads, glasses } = images;
-
-    const bodyData = bodies.map(({ data }) => data);
-    console.log(bodyData);
 
     const bodiesPage = dataToDescriptorInput(bodies.map(({ data }) => data));
     const headsPage = dataToDescriptorInput(heads.map(({ data }) => data));
@@ -64,3 +52,4 @@ task('populate-descriptor', 'Populates the descriptor with color palettes and No
 
     console.log('Descriptor populated with palettes and parts.');
   });
+

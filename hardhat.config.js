@@ -7,7 +7,7 @@ module.exports = {
   solidity: "0.8.22", 
   networks: {
     sepolia: {
-      url: process.env.ALCHEMY_API_URL, 
+      url: process.env.ETH_RPC_URL, 
       accounts: [process.env.PRIVATE_KEY], 
     },
   },

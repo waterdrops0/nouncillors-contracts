@@ -9,45 +9,56 @@ import { NouncillorsDescriptor } from '../../contracts/NouncillorsDescriptor.sol
 import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncilDAOExecutor } from '../../contracts/governance/NouncilDAOExecutor.sol';
-import { NouncilDAOLogicHelpers } from './helpers/NouncilDAOLogicHelpers.sol';
+import { DeployUtils } from './helpers/DeployUtils.sol';
 
 
-contract NouncilDAOLogicStateTest is Test, NouncilDAOLogicHelpers {
+contract NouncilDAOLogicState is Test, DeployUtils {
 
     function setUp() public {
 
-        NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
-        nouncillorsToken = deployToken(nouncilDAO);
 
-        daoProxy = deployDAOProxy(address(timelock), address(nouncillorsToken));
 
-        vm.prank(address(timelock));
-        timelock.setPendingAdmin(address(daoProxy));
-        vm.prank(address(daoProxy));
-        timelock.acceptAdmin();
-
-   
-        mint(proposer, 1);
+        NouncilDAOLogic dao = deployDAOWithParams();
+        mint(PROPOSER, 1);
         vm.roll(block.number + 1);
     }
 
-    function daoVersion() internal pure override returns (uint256) {
-        return 1;
+    function propose(
+        address target,
+        uint256 value,
+        string memory signature,
+        bytes memory data
+    ) internal returns (uint256 proposalId) {
+        vm.prank(PROPOSER);
+        address[] memory targets = new address[](1);
+        targets[0] = target;
+        uint256[] memory values = new uint256[](1);
+        values[0] = value;
+        string[] memory signatures = new string[](1);
+        signatures[0] = signature;
+        bytes[] memory calldatas = new bytes[](1);
+        calldatas[0] = data;
+        
+        proposalId = daoProxy.propose(targets, values, signatures, calldatas, 'my proposal');
     }
 
-    function deployDAOProxy(address, address, address) internal override returns (NouncilDAOLogic) {
-        return NouncilDAOLogic(address(_createDAOV3Proxy()));
-    }
 
     function testRevertsGivenProposalIdThatDoesntExist() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
+        console.log("Generated Proposal ID:", proposalId);
+
+        uint256 state = uint256(NouncilDAOLogic(payable(address(daoProxy))).state(proposalId));
+
         vm.expectRevert('NouncilDAO::state: invalid proposal id');
         daoProxy.state(proposalId + 1);
     }
 
     function testPendingGivenProposalJustCreated() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
+        console.log("Generated Proposal ID:", proposalId);
+
         uint256 state = uint256(NouncilDAOLogic(payable(address(daoProxy))).state(proposalId));
+        console.log("Proposal State after creation: ", state);
 
         assertTrue(daoProxy.state(proposalId) == NouncilDAOStorageV1.ProposalState.Pending);
     }
@@ -60,7 +71,7 @@ contract NouncilDAOLogicStateTest is Test, NouncilDAOLogicHelpers {
 
     function testCanceledGivenCanceledProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        vm.prank(proposer);
+        vm.prank(PROPOSER);
         daoProxy.cancel(proposalId);
 
         assertTrue(daoProxy.state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled);
@@ -115,7 +126,7 @@ contract NouncilDAOLogicStateTest is Test, NouncilDAOLogicHelpers {
 
     function testQueueRevertsGivenCanceledProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        vm.prank(proposer);
+        vm.prank(PROPOSER);
         daoProxy.cancel(proposalId);
 
         assertTrue(daoProxy.state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled);

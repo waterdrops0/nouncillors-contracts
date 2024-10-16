@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import 'forge-std/Test.sol';
 import { DescriptorHelpers } from './DescriptorHelpers.sol';
+import { DAOLogicHelpers } from './DAOLogicHelpers.sol';
 import { NouncillorsDescriptor } from '../../../contracts/NouncillorsDescriptor.sol';
 import { NouncilDAOExecutor } from '../../../contracts/governance/NouncilDAOExecutor.sol';
 import { NouncilDAOLogic } from '../../../contracts/governance/NouncilDAOLogic.sol';
@@ -12,13 +13,7 @@ import { IProxyRegistry } from '../../../contracts/external/opensea/IProxyRegist
 import { NouncillorsToken } from '../../../contracts/NouncillorsToken.sol';
 import { NouncilDAOStorageV1 } from '../../../contracts/governance/NouncilDAOInterfaces.sol';
 
-abstract contract DeployUtils is Test, DescriptorHelpers {
-    uint256 constant TIMELOCK_DELAY = 2 days;
-    uint256 constant VOTING_PERIOD = 7_200; // 24 hours
-    uint256 constant VOTING_DELAY = 1;
-    uint256 constant PROPOSAL_THRESHOLD = 1;
-    uint256 constant QUORUM_VOTES_BPS = 2000;
-
+abstract contract DeployUtils is Test, DescriptorHelpers, DAOLogicHelpers {
 
     function _deployAndPopulateDescriptor() internal returns (NouncillorsDescriptor) {
         NouncillorsDescriptor descriptor = _deployDescriptor();
@@ -45,99 +40,64 @@ abstract contract DeployUtils is Test, DescriptorHelpers {
         return nouncillorsToken;
     }
 
-    struct NouncilDAOParams {
-        uint256 votingPeriod;
-        uint256 votingDelay;
-        uint256 proposalThresholdBPS;
-        uint256 quorumVotesBPS;
-        address timelock;
-        address admin;
-        address implementation;
-    }
 
-    function _createDAOV3Proxy(
+    function deployDAOProxy(
         address timelock,
-        address nouncillorsToken,
-        address vetoer,
-        NouncilDAOParams memory daoParams
-    ) internal returns (NouncilDAOLogic dao) {
-        dao = NouncilDAOLogic(
-            address(
-                new NouncilDAOProxy(
-                    timelock,
-                    nouncillorsToken,
-                    vetoer,
-                    daoParams.admin,
-                    daoParams.implementation,
-                    daoParams.votingPeriod,
-                    daoParams.votingDelay,
-                    daoParams.proposalThresholdBPS,
-                    daoParams.quorumVotesBPS
-                )
-            )
-        );
-    }
-
-    function _createDAOV3Proxy(
-        address timelock,
-        address nounsToken,
-        address vetoer
-    ) internal returns (NouncilDAOLogic dao) {
-        dao = _createDAOV3Proxy(
+        address nouncillorsToken
+    ) internal returns (NouncilDAOProxy daoProxy) {
+        daoProxy = new NouncilDAOProxy(
             timelock,
-            nounsToken,
-            vetoer,
-            NouncilDAOParams({
-                votingPeriod: VOTING_PERIOD,
-                votingDelay: VOTING_DELAY,
-                proposalThresholdBPS: PROPOSAL_THRESHOLD,
-                quorumVotesBPS: QUORUM_VOTES_BPS,
-                timelock: timelock,
-                admin: address(this),
-                implementation: address(new NouncilDAOLogic())
-            })
+            nouncillorsToken,
+            VETOER,
+            address(this),
+            address(new NouncilDAOLogic()),
+            VOTING_PERIOD,
+            VOTING_DELAY,
+            PROPOSAL_THRESHOLD_BPS,
+            QUORUM_VOTES_BPS
         );
     }
 
-    function _deployDAOV3WithParams() internal returns (NouncilDAOLogic) {
-        NouncilDAOExecutor timelock;
-        NouncillorsToken nouncillorsToken;
 
-        timelock = NouncilDAOExecutor(payable(address(new ERC1967Proxy(address(new NouncilDAOExecutor(address(1), TIMELOCK_DELAY)), ''))));
 
-        nouncillorsToken = deployToken(makeAddr('initialOwner'));
+    function deployDAOWithParams() internal returns (NouncilDAOLogic) {
+        // Deploy the timelock without a proxy
+        timelock = new NouncilDAOExecutor(ADMIN, TIMELOCK_DELAY);
 
+        // Deploy the nouncillors token and transfer ownership to timelock
+        nouncillorsToken = deployToken(INITIAL_OWNER);
         nouncillorsToken.transferOwnership(address(timelock));
 
-        address daoLogicImplementation = address(new NouncilDAOLogic());
 
+
+        // Deploy the DAO proxy, passing in all necessary parameters
         NouncilDAOLogic dao = NouncilDAOLogic(
             payable(
                 new NouncilDAOProxy(
                     address(timelock),
                     address(nouncillorsToken),
-                    makeAddr('vetoer'),
-                    address(this),
-                    daoLogicImplementation,
+                    VETOER,
+                    address(this), // The admin is the current contract
+                    nouncilDAO,
                     VOTING_PERIOD,
                     VOTING_DELAY,
-                    PROPOSAL_THRESHOLD,
+                    PROPOSAL_THRESHOLD_BPS,
                     QUORUM_VOTES_BPS
                 )
             )
         );
 
-        vm.prank(address(timelock));
+        // Set the timelock admin to the DAO
         timelock.setPendingAdmin(address(dao));
+
+        // Accept the admin role from the DAO
         vm.prank(address(dao));
         timelock.acceptAdmin();
 
         return dao;
     }
 
-    function _deployDAOV3() internal returns (NouncilDAOLogic) {
-        return _deployDAOV3WithParams();
-    }
+
 
     function get1967Implementation(address proxy) internal view returns (address) {
         bytes32 slot = bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1);
