@@ -1,9 +1,11 @@
-<div align="left">
-  <img src="https://github.com/nounsDAO/nouns-monorepo/blob/master/packages/nouns-assets/images/v0/4-glasses/glasses-square-magenta.png" alt="Nouns Logo" width="90">
+<div>
+  
 </div>
 
 <div align="left">
+  <img src="https://github.com/nounsDAO/nouns-monorepo/blob/master/packages/nouns-assets/images/v0/4-glasses/glasses-square-blue-med-saturated.png" alt="Nouns Logo" width="70">
   <img src="https://github.com/curelycue/nouncillors-contracts/assets/22319741/13c335b7-47a2-4b9a-9fa3-a5dabbc08cc6" alt="Nouncil Logo" width="35">
+
 </div>
 
 <h2 align="center">The Nouncil Protocol</h2>
