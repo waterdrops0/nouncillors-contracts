@@ -7,7 +7,7 @@
 <h2 align="center">The Nouncil Protocol</h2>
 
 <p align="center">
-  This repository contains the contracts used in the Nouncil protocol.
+  This repository contains all the contracts used in the Nouncil protocol.
 </p>
 
 <h2 align="center">Contracts</h2>
