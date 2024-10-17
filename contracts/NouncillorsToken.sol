@@ -86,7 +86,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
         descriptor = _descriptor; // Set the descriptor contract.
         isDescriptorLocked = false; // Descriptor is initially unlocked.
         _currentNouncillorId = 0; // Start token ID counter at 0.
-        _contractURIHash = 'QmZi1n79FqWt2tTLwCqiy6nLM6xLGRsEPQ5JmReJQKNNzX'; // Set URI hash.
+        _contractURIHash = 'QmXDBLet73NTYQt5cY53vw3mt1mxRVRYxJYRc4AFjpb7cA'; // Set URI hash.
     }
 
    /**

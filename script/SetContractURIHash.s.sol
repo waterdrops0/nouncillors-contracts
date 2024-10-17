@@ -16,7 +16,7 @@ contract SetContractURIHash is Script {
         NouncillorsToken nouncillorsToken = NouncillorsToken(nouncillorsTokenAddress);
 
         // Define the new contract URI hash
-        string memory newContractURIHash = "QmNdUibRHNqX2byJLtCD3ofn65cfCtvXdQnV87wRjqWf96";
+        string memory newContractURIHash = "QmXDBLet73NTYQt5cY53vw3mt1mxRVRYxJYRc4AFjpb7cA";
 
         // Start the broadcast to send the transaction
         vm.startBroadcast();
