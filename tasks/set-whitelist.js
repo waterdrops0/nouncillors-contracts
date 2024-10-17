@@ -1,7 +1,7 @@
 const { MerkleTree } = require('merkletreejs');
 const keccak256 = require('keccak256');
 const { ethers } = require("hardhat");
-const AddressData = require('./addresses.json');
+const AddressData = require('../files/addresses.json');
 
 async function main() {
   // Access the addresses from the JSON file
@@ -21,7 +21,7 @@ async function main() {
   const NouncillorsToken = await ethers.getContractFactory("NouncillorsToken");
 
   // Attach to the address of the deployed contract
-  const nouncillorsTokenAddress = "0xdff7597707c5B216df6BbE0c5783A46b6a2D7aB7";
+  const nouncillorsTokenAddress = "0xfA4378Bf63FfAC00A8250FE69F23Dcb05539f694";
   const nouncillorsToken = NouncillorsToken.attach(nouncillorsTokenAddress);
 
   try {

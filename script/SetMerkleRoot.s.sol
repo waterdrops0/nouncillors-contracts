@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Script.sol";
-import "../src/NouncillorsToken.sol"; 
+import "../contracts/NouncillorsToken.sol"; 
 
 contract SetMerkleRoot is Script {
     function run() external {
@@ -12,8 +12,8 @@ contract SetMerkleRoot is Script {
         // Initialize the deployed contract
         NouncillorsToken nouncillorsToken = NouncillorsToken(nouncillorsTokenAddress);
 
-        // Insert the Merkle root you generated here
-        bytes32 rootBytes32 = 0xYOUR_GENERATED_MERKLE_ROOT_HERE;
+        // Insert the new Merkle root you generated here
+        bytes32 rootBytes32 = 0x3078323331310000000000000000000000000000000000000000000000000000; 
 
         // Start broadcasting a transaction
         vm.startBroadcast();

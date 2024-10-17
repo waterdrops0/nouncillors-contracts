@@ -7,6 +7,7 @@ task("deploy", "Deploys the Nouncillors contracts")
 
     const tokenName = "Nouncillors";
     const tokenSymbol = "NNN";
+    const initialOwner = "0xbE41e1Dd8C970AC40E8aB284CDd581e3b35Da51C";
 
     // Calculate the expected address of NouncillorsArt
     const nonce = await deployer.provider.getTransactionCount(deployer.address); 
@@ -23,19 +24,8 @@ task("deploy", "Deploys the Nouncillors contracts")
     await svgRenderer.waitForDeployment();
     console.log("SVGRenderer deployed to: ", svgRenderer.target)
 
-    // Deploy Inflate
-    const Inflate = await hre.ethers.getContractFactory("Inflate");
-    const inflate = await Inflate.delpoy();
-    await inflate.waitForDeployment();
-    console.log("Inflate deployed to:", await inflate,getAddress());
-
     // Deploy Inflator
-    const Inflator = await hre.ethers.getContractFactory("Inflator", {
-      libraries: {
-        Inflate: inflate.target
-      }
-    });
-    
+    const Inflator = await hre.ethers.getContractFactory("Inflator")
     const inflator = await Inflator.deploy();
     await inflator.waitForDeployment();
     console.log("Inflator deployed to:", await inflator.getAddress());
@@ -70,7 +60,7 @@ task("deploy", "Deploys the Nouncillors contracts")
 
      // Deploy the NouncillorsToken implementation contract
     const NouncillorsToken = await hre.ethers.getContractFactory("NouncillorsToken");
-    const nouncillorsToken = await NouncillorsToken.deploy('0xc0768A60Cf71341C942930E077b7EDf390c3E4c7', tokenName, tokenSymbol, erc2771Forwarder.target, nouncillorsDescriptor.target);
+    const nouncillorsToken = await NouncillorsToken.deploy(initialOwner, tokenName, tokenSymbol, erc2771Forwarder.target, nouncillorsDescriptor.target);
     await nouncillorsToken.waitForDeployment();
     console.log("NouncillorsToken deployed to:", await nouncillorsToken.getAddress());
 

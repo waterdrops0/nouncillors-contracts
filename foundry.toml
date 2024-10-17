@@ -9,10 +9,8 @@ ffi = true
 [profile.lite]
 optimizer = false
 
-[libraries]
+[profile.default.libraries]
 NouncillorsDescriptor = { NFTDescriptor = "0xLibrary1Address" }
-Inflator = { Inflate = "0xLibrary2Address" }
-
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -25,14 +25,14 @@ address constant INITIAL_OWNER = address(0x5);
 address nouncilDAO = address(0x6);
 address constant PROPOSER = address(0x7);
 
-NouncilDAOLogic daoProxy;
+NouncilDAOLogic dao;
 NouncillorsToken nouncillorsToken;
 NouncilDAOExecutor timelock;
 Utils utils;
 
 
     function daoVersion() internal virtual returns (uint256) {
-        return 0; // override to specify version
+        return 0;
     }
 
 
