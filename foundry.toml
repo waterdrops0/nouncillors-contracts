@@ -9,7 +9,7 @@ ffi = true
 [profile.lite]
 optimizer = false
 
-[profile.default.libraries]
+[profile.libraries]
 NouncillorsDescriptor = { NFTDescriptor = "0xLibrary1Address" }
 
 
