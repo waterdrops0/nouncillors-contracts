@@ -53,7 +53,9 @@ interface INouncillorsToken is IERC721 {
 
     error DescriptorisLocked();
 
-    function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256);
+    function mintWithProof(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256);
+
+    function mint(Seed calldata _seed, address recipient) external returns (uint256);
     
     function burn(uint256 tokenId) external;
 

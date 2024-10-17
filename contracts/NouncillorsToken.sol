@@ -138,7 +138,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
      * @param _seed The seed data to be associated with the minted Nouncillor NFT.
      * @return The ID of the newly minted token.
      */
-    function mint(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256) {
+    function mintWithProof(bytes32[] calldata _merkleProof, Seed calldata _seed) external returns (uint256) {
         address sender = _msgSender();
 
         require(sender != address(0), "Cannot mint to the zero address");
@@ -188,7 +188,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
     * @param recipient The address to mint the token to.
     * @return The ID of the newly minted token.
     */
-    function mint_new(Seed calldata _seed, address recipient) external onlyOwner returns (uint256) {
+    function mint(Seed calldata _seed, address recipient) external onlyOwner returns (uint256) {
         require(recipient != address(0), "Cannot mint to the zero address");
 
         // Revert if the recipient has already minted
