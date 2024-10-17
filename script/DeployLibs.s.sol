@@ -12,6 +12,7 @@ contract DeployLibs is Script {
         // Deploy the NFTDescriptor library
         NFTDescriptor nftDescriptor = new NFTDescriptor();
         console.log("NFTDescriptor deployed at:", address(nftDescriptor));
+        console.log("Add this library's address to your foundry.toml file before moving forward with the deployment.");
 
         // Stop broadcasting
         vm.stopBroadcast();

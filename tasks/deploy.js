@@ -6,7 +6,7 @@ task("deploy", "Deploys the Nouncillors contracts")
     console.log("Deploying contracts with the account:", deployer.address);
 
     const tokenName = "Nouncillors";
-    const tokenSymbol = "NNN";
+    const tokenSymbol = "NC";
     const initialOwner = "0xbE41e1Dd8C970AC40E8aB284CDd581e3b35Da51C";
 
     // Calculate the expected address of NouncillorsArt
@@ -48,7 +48,7 @@ task("deploy", "Deploys the Nouncillors contracts")
         NFTDescriptor: nftDescriptor.target
       }
     });
-    const nouncillorsDescriptor = await NouncillorsDescriptor.deploy(deployer.address, expectedNouncillorsArtAddress, svgRenderer.target);
+    const nouncillorsDescriptor = await NouncillorsDescriptor.deploy(deployer.address, expectedNouncillorsArtAddress, svgRenderer.getAddress());
     await nouncillorsDescriptor.waitForDeployment();
     console.log("NouncillorsDescriptor deployed to:", await nouncillorsDescriptor.getAddress());
 

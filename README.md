@@ -23,32 +23,32 @@
   <tbody>
     <tr>
       <td>NouncillorsToken.sol</td>
-      <td><a href="https://sepolia.etherscan.io/address/0xfA4378Bf63FfAC00A8250FE69F23Dcb05539f694">0xfA4378Bf63FfAC00A8250FE69F23Dcb05539f694</a></td>
+      <td><a href="https://sepolia.etherscan.io/address/0x4C87D41bA34D988C1FF4515C87532eeb41FC8ed8">0x4C87D41bA34D988C1FF4515C87532eeb41FC8ed8</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>NouncillorsDescriptor.sol</td>
-      <td><a href="https://sepolia.etherscan.io/address/0x7E6d22b70E64e78c6fa4261A0c1d5482a016De9e">0x7E6d22b70E64e78c6fa4261A0c1d5482a016De9e</a></td>
+      <td><a href="https://sepolia.etherscan.io/address/0x07fa65A51586471Beac4cDfeEe37d30f12f62145">0x07fa65A51586471Beac4cDfeEe37d30f12f62145</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>NouncillorsArt.sol</td>
-      <td><a href="https://sepolia.etherscan.io/address/0xD332540bE62b8EDe9d93Bc83d322fA944dAD6a17">0xD332540bE62b8EDe9d93Bc83d322fA944dAD6a17</a></td>
+      <td><a href="https://sepolia.etherscan.io/address/0xA82446534d6821B3fcB770f96dd05004fe26b80E">0xA82446534d6821B3fcB770f96dd05004fe26b80E</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>Inflator.sol</td>
-      <td><a href="https://sepolia.etherscan.io/address/0xd70117E5Ec765A43238D3d687685685712fb0816">0xd70117E5Ec765A43238D3d687685685712fb0816</a></td>
+      <td><a href="https://sepolia.etherscan.io/address/0x8EA937aD00365C3A31CF15536144DfB97Fb7d12E">0x8EA937aD00365C3A31CF15536144DfB97Fb7d12E</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>SVGRenderer.sol</td>
-      <td><a href="https://sepolia.etherscan.io/address/0x4A7dA37fcEe4724bf4B62A341CB8E51bb21f14eB">0x366D2Ac2a898dbb477d6aF333570D5Ca06Ed4b76</a></td>
+      <td><a href="https://sepolia.etherscan.io/address/0x778442Eee68a2C2A78E49E8Ac3449c996440ff23">0x778442Eee68a2C2A78E49E8Ac3449c996440ff23</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>NouncilForwarder.sol</td>
-      <td><a href="https://sepolia.etherscan.com/address/0xEaC3Bb382E3AA6EBd26A902cF15007629fB90434">0xEaC3Bb382E3AA6EBd26A902cF15007629fB90434</a></td>
+      <td><a href="https://sepolia.etherscan.com/address/0xD82D2Cd2c0D78421A4Ffdf630DdC7b1dA4e60666">0xD82D2Cd2c0D78421A4Ffdf630DdC7b1dA4e60666</a></td>
       <td>-</td>
     </tr>
     <tr>
