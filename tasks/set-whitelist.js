@@ -21,7 +21,7 @@ async function main() {
   const NouncillorsToken = await ethers.getContractFactory("NouncillorsToken");
 
   // Attach to the address of the deployed contract
-  const nouncillorsTokenAddress = "0x4C87D41bA34D988C1FF4515C87532eeb41FC8ed8";
+  const nouncillorsTokenAddress = "0x8D047492Adfbb94C6cD48300b5df5e7872Ad0C40";
   const nouncillorsToken = NouncillorsToken.attach(nouncillorsTokenAddress);
 
   try {

@@ -6,12 +6,12 @@ task('populate-descriptor', 'Populates the descriptor with color palettes and No
   .addOptionalParam(
     'nftDescriptor',
     'The `NFTDescriptor` contract address',
-    '0x78daa8b499f0e7EAAC4B24aCe20C972797DFd663',
+    '0x74aFa86158289407A328C79918cd99b38A219250',
   )
   .addOptionalParam(
     'nouncillorsDescriptor',
     'The `NouncillorsDescriptor` contract address',
-    '0x07fa65A51586471Beac4cDfeEe37d30f12f62145',
+    '0x5170738fDd382b4Bf663E62014e5156C627b208a',
   )
   .setAction(async ({ nftDescriptor, nouncillorsDescriptor }, hre) => {
     const options = { gasLimit: hre.network.name === 'hardhat' ? 30000000 : undefined };
