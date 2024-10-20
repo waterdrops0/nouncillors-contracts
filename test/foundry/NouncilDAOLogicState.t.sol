@@ -50,14 +50,16 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         nouncillorsToken.ownerOf(0);
 
         nouncillorsToken.votesToDelegate(PROPOSER);
-        
+                
         vm.prank(PROPOSER);
-        nouncillorsToken.delegate(PROPOSER);
+        nouncillorsToken.delegate(INITIAL_OWNER); // Delegate to address(0) first
+        vm.roll(block.number + 1);
 
-        vm.roll(block.number +1);
- 
+        vm.prank(PROPOSER);
+        nouncillorsToken.delegate(PROPOSER); // Now delegate to PROPOSER
+        vm.roll(block.number + 1);
 
-        nouncillorsToken.getPriorVotes(PROPOSER, block.number - 1);
+        nouncillorsToken.getPriorVotes(INITIAL_OWNER, block.number - 1);
         nouncillorsToken.getCurrentVotes(PROPOSER);
 
         // If needed, advance time and blocks further

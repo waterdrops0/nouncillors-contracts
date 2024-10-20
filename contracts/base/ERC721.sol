@@ -412,15 +412,15 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         uint256 tokenId,
         bytes memory _data
     ) private returns (bool) {
-        if (to.isContract()) {
+        if (to.code.length > 0) { // Check if the address contains code (i.e., it's a contract)
             try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, _data) returns (bytes4 retval) {
-                return retval == IERC721Receiver(to).onERC721Received.selector;
+                return retval == IERC721Receiver.onERC721Received.selector;
             } catch (bytes memory reason) {
                 if (reason.length == 0) {
-                    revert('ERC721: transfer to non ERC721Receiver implementer');
+                    revert("ERC721: transfer to non ERC721Receiver implementer");
                 } else {
                     assembly {
-                        revert(add(32, reason), mload(reason))
+                        revert(add(reason, 32), mload(reason))
                     }
                 }
             }
