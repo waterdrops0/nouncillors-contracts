@@ -22,7 +22,6 @@ abstract contract DeployUtils is Test, DescriptorHelpers, DAOLogicHelpers {
     }
 
     function deployToken(address initialOwner) internal returns (NouncillorsToken nouncillorsToken) {
-        IProxyRegistry proxyRegistry = IProxyRegistry(address(3));
         NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
 
         string memory tokenName = "Nouncillors";
@@ -66,6 +65,7 @@ abstract contract DeployUtils is Test, DescriptorHelpers, DAOLogicHelpers {
 
         // Deploy the nouncillors token and transfer ownership to timelock
         nouncillorsToken = deployToken(INITIAL_OWNER);
+        vm.prank(INITIAL_OWNER);
         nouncillorsToken.transferOwnership(address(timelock));
 
 

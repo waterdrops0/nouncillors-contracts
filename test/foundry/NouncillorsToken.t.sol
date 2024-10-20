@@ -38,7 +38,7 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         });
 
         vm.prank(owner);
-        nouncillorsToken.mint_new(seed, owner);
+        nouncillorsToken.mint(seed, owner);
 
         assertEq(nouncillorsToken.ownerOf(0), owner);
     }
@@ -61,6 +61,6 @@ contract NouncillorsTokenTest is Test, DeployUtils {
         vm.expectRevert(abi.encodeWithSelector(OwnableUnauthorizedAccount.selector, unauthorized));
 
         // Try to mint
-        nouncillorsToken.mint_new(seed, unauthorized);
+        nouncillorsToken.mint(seed, unauthorized);
     }
 }

@@ -33,7 +33,7 @@
 
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import './ERC721Enumerable.sol';
 
 abstract contract ERC721Checkpointable is ERC721Enumerable {
     /// @notice Defines decimals as per ERC-20 convention to make integrations with 3rd party governance platforms easier

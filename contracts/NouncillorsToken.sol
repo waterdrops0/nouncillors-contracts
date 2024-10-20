@@ -114,7 +114,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
     * @return The token URI of the given token ID.
     */
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        _requireOwned(tokenId);
+        require(_exists(tokenId), 'NouncillorsToken: URI query for nonexistent token');
         return descriptor.tokenURI(tokenId, seeds[tokenId]);
     }
 
@@ -125,10 +125,9 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
     * @return The data URI of the given token ID.
     */
     function dataURI(uint256 tokenId) public view override returns (string memory) {
-        _requireOwned(tokenId);
+        require(_exists(tokenId), 'NouncillorssToken: URI query for nonexistent token');
         return descriptor.dataURI(tokenId, seeds[tokenId]);
     }
-
 
     /**
      * @notice Mints a new token if the sender is whitelisted and hasn't minted before.
@@ -325,7 +324,7 @@ contract NouncillorsToken is INouncillorsToken, ERC2771Context, Ownable, ERC721C
         seeds[nouncillorId] = seed;
 
         // Mint the token
-        _safeMint(to, nouncillorId);
+        _mint(to, nouncillorId);
  
         // Emit an event for the minting
         emit NouncillorCreated(nouncillorId, seed, to);
