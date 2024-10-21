@@ -47,23 +47,6 @@ contract NouncilDAOLogicState is Test, DeployUtils {
 
         vm.roll(block.number +1);
 
-        nouncillorsToken.ownerOf(0);
-
-        nouncillorsToken.votesToDelegate(PROPOSER);
-                
-        vm.prank(PROPOSER);
-        nouncillorsToken.delegate(INITIAL_OWNER); // Delegate to address(0) first
-        vm.roll(block.number + 1);
-
-        vm.prank(PROPOSER);
-        nouncillorsToken.delegate(PROPOSER); // Now delegate to PROPOSER
-        vm.roll(block.number + 1);
-
-        nouncillorsToken.getPriorVotes(INITIAL_OWNER, block.number - 1);
-        nouncillorsToken.getCurrentVotes(PROPOSER);
-
-        // If needed, advance time and blocks further
-        vm.roll(block.number + 10);
 
     }
 
@@ -88,37 +71,44 @@ contract NouncilDAOLogicState is Test, DeployUtils {
 
 
     function testRevertsGivenProposalIdThatDoesntExist() public {
+        // Create a proposal and get the valid proposalId
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         console.log("Generated Proposal ID:", proposalId);
 
-        uint256 state = uint256(NouncilDAOLogic(address(daoProxy)).state(proposalId));
+        // Advance the block number by 1 to pass the VOTING_DELAY
+        vm.roll(block.number + 1);
 
+        // Now check the state of the valid proposalId
+        //uint256 state = uint256(NouncilDAOLogic(address(daoProxy)).state(proposalId));
+        //console.log("State of valid proposal:", state);
+
+        // Now test the invalid proposalId and expect a revert
         vm.expectRevert('NouncilDAO::state: invalid proposal id');
-        // Cast `daoProxy` to `NouncilDAOLogic` when calling `state`
-        NouncilDAOLogic(address(daoProxy)).state(proposalId + 1);
+        
+        // Calling state on proposalId + 1, which should not exist and should revert
+        dao.state(proposalId + 1);
     }
-
 
     function testPendingGivenProposalJustCreated() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         console.log("Generated Proposal ID:", proposalId);
 
         // Cast `daoProxy` to `NouncilDAOLogic` to access the `state` function
-        uint256 state = uint256(NouncilDAOLogic(address(daoProxy)).state(proposalId));
+        uint256 state = uint256(dao.state(proposalId));
         console.log("Proposal State after creation: ", state);
 
         // Use the same casting in the assertion
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Pending
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Pending
         );
     }
 
     function testActiveGivenProposalPastVotingDelay() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        uint256 votingDelay = NouncilDAOLogic(address(daoProxy)).votingDelay();
+        uint256 votingDelay = dao.votingDelay();
         vm.roll(block.number + votingDelay + 1);
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Active
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Active
         );
     }
 
@@ -126,10 +116,10 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     function testCanceledGivenCanceledProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.prank(PROPOSER);
-        NouncilDAOLogic(address(daoProxy)).cancel(proposalId);
+        dao.cancel(proposalId);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled
         );
     }
 
@@ -137,12 +127,12 @@ contract NouncilDAOLogicState is Test, DeployUtils {
 
     function testDefeatedByRunningOutOfTime() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        uint256 votingDelay = NouncilDAOLogic(address(daoProxy)).votingDelay();
-        uint256 votingPeriod = NouncilDAOLogic(address(daoProxy)).votingPeriod();
+        uint256 votingDelay = dao.votingDelay();
+        uint256 votingPeriod = dao.votingPeriod();
         vm.roll(block.number + votingDelay + votingPeriod + 1);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
         );
     }
 
@@ -160,7 +150,7 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         endVotingPeriod();
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
         );
     }
 
@@ -177,35 +167,35 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         endVotingPeriod();
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Succeeded
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Succeeded
         );
     }
 
     function testQueueRevertsGivenDefeatedProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
-        uint256 votingDelay = NouncilDAOLogic(address(daoProxy)).votingDelay();
-        uint256 votingPeriod = NouncilDAOLogic(address(daoProxy)).votingPeriod();
+        uint256 votingDelay = dao.votingDelay();
+        uint256 votingPeriod = dao.votingPeriod();
         vm.roll(block.number + votingDelay + votingPeriod + 1);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Defeated
         );
 
         vm.expectRevert('NouncilDAO::queue: proposal can only be queued if it is succeeded');
-        NouncilDAOLogic(address(daoProxy)).queue(proposalId);
+        dao.queue(proposalId);
     }
 
     function testQueueRevertsGivenCanceledProposal() public {
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.prank(PROPOSER);
-        NouncilDAOLogic(address(daoProxy)).cancel(proposalId);
+        dao.cancel(proposalId);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Canceled
         );
 
         vm.expectRevert('NouncilDAO::queue: proposal can only be queued if it is succeeded');
-        NouncilDAOLogic(address(daoProxy)).queue(proposalId);
+        dao.queue(proposalId);
     }
 
     function testQueued() public {
@@ -221,10 +211,10 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         endVotingPeriod();
 
         // anyone can queue
-        NouncilDAOLogic(address(daoProxy)).queue(proposalId);
+        dao.queue(proposalId);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Queued
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Queued
         );
     }
 
@@ -239,13 +229,13 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         vote(forVoter, proposalId, 1);
         vote(againstVoter, proposalId, 0);
         endVotingPeriod();
-        NouncilDAOLogic(address(daoProxy)).queue(proposalId);
+        dao.queue(proposalId);
 
         // Ensure `timelock` is properly initialized
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Expired
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Expired
         );
     }
 
@@ -255,32 +245,32 @@ contract NouncilDAOLogicState is Test, DeployUtils {
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.expectRevert('NouncilDAO::execute: proposal can only be executed if it is queued');
-        NouncilDAOLogic(address(daoProxy)).execute(proposalId);
+        dao.execute(proposalId);
 
         startVotingPeriod();
         vote(forVoter, proposalId, 1);
         vm.expectRevert('NouncilDAO::execute: proposal can only be executed if it is queued');
-        NouncilDAOLogic(address(daoProxy)).execute(proposalId);
+        dao.execute(proposalId);
 
         endVotingPeriod();
         vm.expectRevert('NouncilDAO::execute: proposal can only be executed if it is queued');
-        NouncilDAOLogic(address(daoProxy)).execute(proposalId);
+        dao.execute(proposalId);
 
-        NouncilDAOLogic(address(daoProxy)).queue(proposalId);
+        dao.queue(proposalId);
         vm.expectRevert("NouncilDAOExecutor::executeTransaction: Transaction hasn't surpassed time lock.");
-        NouncilDAOLogic(address(daoProxy)).execute(proposalId);
+        dao.execute(proposalId);
 
         vm.warp(block.timestamp + timelock.delay() + 1);
         vm.deal(address(timelock), 100);
-        NouncilDAOLogic(address(daoProxy)).execute(proposalId);
+        dao.execute(proposalId);
 
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Executed
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Executed
         );
 
         vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
         assertTrue(
-            NouncilDAOLogic(address(daoProxy)).state(proposalId) == NouncilDAOStorageV1.ProposalState.Executed
+            dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Executed
         );
     }
 }
