@@ -29,7 +29,7 @@ address constant PROPOSER = address(0x7);
 NouncilDAOProxy daoProxy;
 NouncilDAOLogic dao;
 NouncillorsToken nouncillorsToken;
-NouncilDAOExecutor timelock;
+NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(1), TIMELOCK_DELAY);
 
 
     function daoVersion() internal virtual returns (uint256) {

@@ -15,6 +15,7 @@ import { Utils } from './helpers/Utils.sol';
 
 contract NouncilDAOLogicState is Test, DeployUtils {
     Utils utils;
+    
 
     function setUp() public {
         // Initialize the Utils contract
@@ -24,8 +25,8 @@ contract NouncilDAOLogicState is Test, DeployUtils {
 
         nouncillorsToken = new NouncillorsToken(INITIAL_OWNER, "Nouncillors", "NCL", address(0), descriptor);
 
-        // Deploy the NouncilDAOExecutor (timelock) contract with initial admin as the test deployer
-        NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(this), TIMELOCK_DELAY);
+        // Deploy the NouncilDAOLogic implementation contract
+        NouncilDAOLogic logic = new NouncilDAOLogic();
 
         // Deploy the NouncilDAOProxy contract
         NouncilDAOProxy daoProxy = new NouncilDAOProxy(
@@ -33,7 +34,7 @@ contract NouncilDAOLogicState is Test, DeployUtils {
             address(nouncillorsToken),
             VETOER,
             address(this),  // admin (initially set as test deployer)
-            address(new NouncilDAOLogic()),
+            address(logic),
             VOTING_PERIOD,
             VOTING_DELAY,
             PROPOSAL_THRESHOLD_BPS,
@@ -43,14 +44,16 @@ contract NouncilDAOLogicState is Test, DeployUtils {
         // Assign `dao` to point to the proxy, cast to `NouncilDAOLogic`
         dao = NouncilDAOLogic(address(daoProxy));
 
-        vm.prank(address(timelock));
-
         // Transfer the admin role from the deployer to the daoProxy
+        vm.prank(address(timelock));
         timelock.setPendingAdmin(address(daoProxy));
 
         // Simulate daoProxy accepting the admin role
         vm.prank(address(daoProxy));
         timelock.acceptAdmin();
+
+        // Ensure that the timelock is correctly set
+        require(address(dao.timelock()) == address(timelock), "Timelock not set properly");
 
         // Mint tokens for the proposer
         mint(PROPOSER, 1);
@@ -271,41 +274,42 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     function testExpired() public {
         address forVoter1 = utils.getNextUserAddress();
         address forVoter2 = utils.getNextUserAddress();
-        address forVoter3 = utils.getNextUserAddress();
-        address forVoter4 = utils.getNextUserAddress();
-        address againstVoter1 = utils.getNextUserAddress();
-        address againstVoter2 = utils.getNextUserAddress();
-        address againstVoter3 = utils.getNextUserAddress();
+        address againstVoter = utils.getNextUserAddress();
 
         mint(forVoter1, 1);
         mint(forVoter2, 1);
-        mint(forVoter3, 1);
-        mint(forVoter4, 1);
-
-        mint(againstVoter1, 1);
-        mint(againstVoter2, 1);
-        mint(againstVoter3, 1);
-
+        mint(againstVoter, 1);
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
+
         startVotingPeriod();
         vote(forVoter1, proposalId, 1);
         vote(forVoter2, proposalId, 1);
-        vote(forVoter3, proposalId, 1);
-        vote(forVoter4, proposalId, 1);
-        vote(againstVoter1, proposalId, 0);
-        vote(againstVoter2, proposalId, 0);
-        vote(againstVoter3, proposalId, 0);
+        vote(againstVoter, proposalId, 0);
         endVotingPeriod();
+
+        // Debugging: Check that the timelock is set in the DAO
+        console.log("DAO Timelock Address: ", address(dao.timelock()));
+        require(address(dao.timelock()) != address(0), "Timelock not initialized in DAO");
+
+        // Queue the proposal
         dao.queue(proposalId);
 
-        // Ensure `timelock` is properly initialized
-        vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 1);
+        // Debugging: Log the grace period to ensure it's accessible
+        console.log("Timelock Grace Period: ", timelock.GRACE_PERIOD());
 
+        // Debugging: Check the timelock address in queueTransaction call
+        console.log("Checking timelock reference in queueTransaction");
+
+        // Warp forward in time to expire the proposal
+        vm.warp(block.timestamp + timelock.delay() + timelock.GRACE_PERIOD() + 10);
+
+        // Ensure the proposal state is 'Expired'
         assertTrue(
             dao.state(proposalId) == NouncilDAOStorageV1.ProposalState.Expired
         );
     }
+
 
     function testExecutedOnlyAfterQueued() public {
         address forVoter1 = utils.getNextUserAddress();
