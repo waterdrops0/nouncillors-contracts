@@ -10,28 +10,29 @@ import { NouncillorsToken } from '../../contracts/NouncillorsToken.sol';
 import { IProxyRegistry } from '../../contracts/external/opensea/IProxyRegistry.sol';
 import { NouncilDAOExecutor } from '../../contracts/governance/NouncilDAOExecutor.sol';
 import { DeployUtils } from './helpers/DeployUtils.sol';
+import { Utils } from './helpers/Utils.sol';
 
 
 contract NouncilDAOLogicState is Test, DeployUtils {
+    Utils utils;
 
     function setUp() public {
+        // Initialize the Utils contract
+        utils = new Utils();
 
         NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
 
-    
         nouncillorsToken = new NouncillorsToken(INITIAL_OWNER, "Nouncillors", "NCL", address(0), descriptor);
 
+        // Deploy the NouncilDAOExecutor (timelock) contract with initial admin as the test deployer
+        NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(this), TIMELOCK_DELAY);
 
-        // Deploy the NouncilDAOExecutor (timelock) contract and get its address
-        address timelockAddress = address(new NouncilDAOExecutor(ADMIN, TIMELOCK_DELAY));
-
-
-        // Deploy the NouncilDAOProxy contract using addresses instead of contract instances
+        // Deploy the NouncilDAOProxy contract
         NouncilDAOProxy daoProxy = new NouncilDAOProxy(
-            timelockAddress,
+            address(timelock),  // Timelock address
             address(nouncillorsToken),
             VETOER,
-            address(this),
+            address(this),  // admin (initially set as test deployer)
             address(new NouncilDAOLogic()),
             VOTING_PERIOD,
             VOTING_DELAY,
@@ -39,15 +40,28 @@ contract NouncilDAOLogicState is Test, DeployUtils {
             QUORUM_VOTES_BPS
         );
 
-
         // Assign `dao` to point to the proxy, cast to `NouncilDAOLogic`
         dao = NouncilDAOLogic(address(daoProxy));
 
+        vm.prank(address(timelock));
+
+        // Transfer the admin role from the deployer to the daoProxy
+        timelock.setPendingAdmin(address(daoProxy));
+
+        // Simulate daoProxy accepting the admin role
+        vm.prank(address(daoProxy));
+        timelock.acceptAdmin();
+
+        // Mint tokens for the proposer
         mint(PROPOSER, 1);
 
-        vm.roll(block.number +1);
+        // Roll forward to the next block
+        vm.roll(block.number + 1);
+    }
 
-
+    function vote(address voter, uint256 proposalId, uint8 support) internal {
+        vm.prank(voter);
+        dao.castVote(proposalId, support);
     }
 
     function propose(
@@ -140,8 +154,8 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     function testDefeatedByVotingAgainst() public {
         address forVoter = utils.getNextUserAddress();
         address againstVoter = utils.getNextUserAddress();
-        mint(forVoter, 3);
-        mint(againstVoter, 3);
+        mint(forVoter, 1);
+        mint(againstVoter, 1);
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         startVotingPeriod();
@@ -155,15 +169,33 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     }
 
     function testSucceeded() public {
-        address forVoter = utils.getNextUserAddress();
-        address againstVoter = utils.getNextUserAddress();
-        mint(forVoter, 4);
-        mint(againstVoter, 3);
+        address forVoter1 = utils.getNextUserAddress();
+        address forVoter2 = utils.getNextUserAddress();
+        address forVoter3 = utils.getNextUserAddress();
+        address forVoter4 = utils.getNextUserAddress();
+        address againstVoter1 = utils.getNextUserAddress();
+        address againstVoter2 = utils.getNextUserAddress();
+        address againstVoter3 = utils.getNextUserAddress();
+        
+
+        mint(forVoter1, 1);
+        mint(forVoter2, 1);
+        mint(forVoter3, 1);
+        mint(forVoter4, 1);
+
+        mint(againstVoter1, 1);
+        mint(againstVoter2, 1);
+        mint(againstVoter3, 1);
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         startVotingPeriod();
-        vote(forVoter, proposalId, 1);
-        vote(againstVoter, proposalId, 0);
+        vote(forVoter1, proposalId, 1);
+        vote(forVoter2, proposalId, 1);
+        vote(forVoter3, proposalId, 1);
+        vote(forVoter4, proposalId, 1);
+        vote(againstVoter1, proposalId, 0);
+        vote(againstVoter2, proposalId, 0);
+        vote(againstVoter3, proposalId, 0);
         endVotingPeriod();
 
         assertTrue(
@@ -199,15 +231,33 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     }
 
     function testQueued() public {
-        address forVoter = utils.getNextUserAddress();
-        address againstVoter = utils.getNextUserAddress();
-        mint(forVoter, 4);
-        mint(againstVoter, 3);
+        address forVoter1 = utils.getNextUserAddress();
+        address forVoter2 = utils.getNextUserAddress();
+        address forVoter3 = utils.getNextUserAddress();
+        address forVoter4 = utils.getNextUserAddress();
+        address againstVoter1 = utils.getNextUserAddress();
+        address againstVoter2 = utils.getNextUserAddress();
+        address againstVoter3 = utils.getNextUserAddress();
+
+        mint(forVoter1, 1);
+        mint(forVoter2, 1);
+        mint(forVoter3, 1);
+        mint(forVoter4, 1);
+
+        mint(againstVoter1, 1);
+        mint(againstVoter2, 1);
+        mint(againstVoter3, 1);
+
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         startVotingPeriod();
-        vote(forVoter, proposalId, 1);
-        vote(againstVoter, proposalId, 0);
+        vote(forVoter1, proposalId, 1);
+        vote(forVoter2, proposalId, 1);
+        vote(forVoter3, proposalId, 1);
+        vote(forVoter4, proposalId, 1);
+        vote(againstVoter1, proposalId, 0);
+        vote(againstVoter2, proposalId, 0);
+        vote(againstVoter3, proposalId, 0);
         endVotingPeriod();
 
         // anyone can queue
@@ -219,15 +269,33 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     }
 
     function testExpired() public {
-        address forVoter = utils.getNextUserAddress();
-        address againstVoter = utils.getNextUserAddress();
-        mint(forVoter, 4);
-        mint(againstVoter, 3);
+        address forVoter1 = utils.getNextUserAddress();
+        address forVoter2 = utils.getNextUserAddress();
+        address forVoter3 = utils.getNextUserAddress();
+        address forVoter4 = utils.getNextUserAddress();
+        address againstVoter1 = utils.getNextUserAddress();
+        address againstVoter2 = utils.getNextUserAddress();
+        address againstVoter3 = utils.getNextUserAddress();
+
+        mint(forVoter1, 1);
+        mint(forVoter2, 1);
+        mint(forVoter3, 1);
+        mint(forVoter4, 1);
+
+        mint(againstVoter1, 1);
+        mint(againstVoter2, 1);
+        mint(againstVoter3, 1);
+
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         startVotingPeriod();
-        vote(forVoter, proposalId, 1);
-        vote(againstVoter, proposalId, 0);
+        vote(forVoter1, proposalId, 1);
+        vote(forVoter2, proposalId, 1);
+        vote(forVoter3, proposalId, 1);
+        vote(forVoter4, proposalId, 1);
+        vote(againstVoter1, proposalId, 0);
+        vote(againstVoter2, proposalId, 0);
+        vote(againstVoter3, proposalId, 0);
         endVotingPeriod();
         dao.queue(proposalId);
 
@@ -240,15 +308,23 @@ contract NouncilDAOLogicState is Test, DeployUtils {
     }
 
     function testExecutedOnlyAfterQueued() public {
-        address forVoter = utils.getNextUserAddress();
-        mint(forVoter, 4);
+        address forVoter1 = utils.getNextUserAddress();
+        address forVoter2 = utils.getNextUserAddress();
+        address forVoter3 = utils.getNextUserAddress();
+        address forVoter4 = utils.getNextUserAddress();
+
+        mint(forVoter1, 1);
+        mint(forVoter2, 1);
+        mint(forVoter3, 1);
+        mint(forVoter4, 1);
+
 
         uint256 proposalId = propose(address(0x1234), 100, '', '');
         vm.expectRevert('NouncilDAO::execute: proposal can only be executed if it is queued');
         dao.execute(proposalId);
 
         startVotingPeriod();
-        vote(forVoter, proposalId, 1);
+        vote(forVoter1, proposalId, 1);
         vm.expectRevert('NouncilDAO::execute: proposal can only be executed if it is queued');
         dao.execute(proposalId);
 

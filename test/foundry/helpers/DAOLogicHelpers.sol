@@ -30,7 +30,6 @@ NouncilDAOProxy daoProxy;
 NouncilDAOLogic dao;
 NouncillorsToken nouncillorsToken;
 NouncilDAOExecutor timelock;
-Utils utils;
 
 
     function daoVersion() internal virtual returns (uint256) {
@@ -62,11 +61,6 @@ Utils utils;
 
     function endVotingPeriod() internal {
         vm.roll(block.number + dao.votingDelay() + dao.votingPeriod() + 1);
-    }
-
-    function vote(address voter, uint256 proposalId, uint8 support) internal {
-        vm.prank(voter);
-        dao.castVote(proposalId, support);
     }
 
 }
