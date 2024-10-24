@@ -5,9 +5,9 @@ import "forge-std/Script.sol";
 import {NouncilDAOExecutor} from "../contracts/governance/NouncilDAOExecutor.sol";
 
 contract ExecuteAdminTransaction is Script {
-    address public constant EXECUTOR_ADDRESS = 0x29CBD0398bB256B651B7d6427e2fDa2B825763cf; // NouncilDAOExecutor address
-    address public constant PROXY_ADDRESS = 0xd8b3fDb6b59B30042dD136137292c821765d2E17; // NouncilDAOProxy address
-    uint256 public constant ETA = 1729950396; // Replace with the correct ETA from the queued transaction
+    address public constant EXECUTOR_ADDRESS = 0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474; // NouncilDAOExecutor address
+    address public constant PROXY_ADDRESS = 0x8097173bCA40971642E3A780aAd420a45E8Cb610; // NouncilDAOProxy address
+    uint256 public constant ETA = 1729952460; // Replace with the correct ETA from the queued transaction
 
     function run() external {
         // Fetch the private key of the deployer from environment variable
