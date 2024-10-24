@@ -4,6 +4,12 @@ require('./tasks/populate-descriptor');
 require('dotenv').config()
 
 module.exports = {
+
+  etherscan: {
+    apiKey: {
+      sepolia: "RXBNRTRIZ6NSMK8A5X73ZXB34EWQKM3JVS" 
+    }
+  },
   solidity: {
     version: "0.8.22",
     settings: {
