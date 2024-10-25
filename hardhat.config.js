@@ -22,7 +22,7 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: process.env.ETH_RPC_URL, 
+      url: process.env.SEPOLIA_RPC_URL, 
       accounts: [process.env.PRIVATE_KEY], 
     },
   },

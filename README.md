@@ -52,17 +52,17 @@
   </tr>
     <tr>
       <td>NouncilDAOProxy.sol</td>
-      <td><a href = "https:sepolia.etherscan.io/address/0x8097173bCA40971642E3A780aAd420a45E8Cb610">0x8097173bCA40971642E3A780aAd420a45E8Cb610</a></td>
+      <td><a href = "https://sepolia.etherscan.io/address/0x8097173bCA40971642E3A780aAd420a45E8Cb610">0x8097173bCA40971642E3A780aAd420a45E8Cb610</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>NouncilDAOLogic.sol</td>
-      <td><a href = "https:sepolia.etherscan.io/address/0xB6F27CeB894E1454f41c2e178EEe016b66591210">0xB6F27CeB894E1454f41c2e178EEe016b66591210</a></td>
+      <td><a href = "https://sepolia.etherscan.io/address/0xB6F27CeB894E1454f41c2e178EEe016b66591210">0xB6F27CeB894E1454f41c2e178EEe016b66591210</a></td>
       <td>-</td>
     </tr>
     <tr>
       <td>NouncilDAOExecutor.sol</td>
-      <td><a href = "https:sepolia.etherscan.io/address/0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474">0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474</a></td>
+      <td><a href = "https://sepolia.etherscan.io/address/0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474">0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474</a></td>
       <td>-</td>
     </tr>
   </tbody>

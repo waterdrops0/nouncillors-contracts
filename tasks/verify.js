@@ -8,6 +8,10 @@ async function main() {
   const nouncillorsArtAddress = "0xA699bbD00C232607f8ff04105603f40282F47fA5";
   const nouncillorsTokenAddress = "0x8D047492Adfbb94C6cD48300b5df5e7872Ad0C40";
   const initialOwner = "0xbE41e1Dd8C970AC40E8aB284CDd581e3b35Da51C"; // Initial owner
+
+  const nouncilDAOLogicAddress = "0xB6F27CeB894E1454f41c2e178EEe016b66591210";
+  const nouncilDAOExecutorAddress = "0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474";
+  const nouncilDAOProxyAddress = "0x8097173bCA40971642E3A780aAd420a45E8Cb610";
   
   try {
     // Verify SVGRenderer
@@ -48,6 +52,33 @@ async function main() {
       address: nouncillorsTokenAddress,
       constructorArguments: [initialOwner, "Nouncillors", "NC", erc2771ForwarderAddress, nouncillorsDescriptorAddress]
     });
+
+    // Verify NouncilDAOLogic
+    await hre.run("verify:verify", {
+      address: nouncilDAOLogicAddress,
+    });
+
+    // Verify NouncilDAOExecutor
+    await hre.run("verify:verify", {
+      address: nouncilDAOExecutorAddress,
+      constructorArguments: [initialOwner, 2 * 24 * 60 * 60], // Delay of 2 days in seconds
+    });
+
+    // Verify NouncilDAOProxy
+    await hre.run("verify:verify", {
+      address: nouncilDAOProxyAddress,
+      constructorArguments: [
+        nouncilDAOExecutorAddress,
+        nouncillorsTokenAddress,
+        initialOwner, // Vetoer
+        initialOwner, // Initial Admin
+        nouncilDAOLogicAddress,
+        7200, // Voting Period
+        1,    // Voting Delay
+        1,    // Proposal Threshold BPS
+        2000, // Quorum Votes BPS
+      ],
+    });    
     
     console.log("Contracts verified successfully!");
 
