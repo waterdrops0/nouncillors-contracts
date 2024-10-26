@@ -10,13 +10,13 @@ interface NouncillorsToken {
 contract SetContractURIHash is Script {
     function run() external {
         // Sepolia Contract Address for NouncillorsToken.sol
-        address nouncillorsTokenAddress = 0xfA4378Bf63FfAC00A8250FE69F23Dcb05539f694;
+        address nouncillorsTokenAddress = 0x8D047492Adfbb94C6cD48300b5df5e7872Ad0C40;
 
         // Interface to interact with the deployed contract
         NouncillorsToken nouncillorsToken = NouncillorsToken(nouncillorsTokenAddress);
 
         // Define the new contract URI hash
-        string memory newContractURIHash = "QmXDBLet73NTYQt5cY53vw3mt1mxRVRYxJYRc4AFjpb7cA";
+        string memory newContractURIHash = "QmXUHY6xLYVL9SNcGQ7xVBxLyE6ZcKaJ9FohsHSFNgAL4E";
 
         // Start the broadcast to send the transaction
         vm.startBroadcast();
