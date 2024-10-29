@@ -26,13 +26,15 @@ contract DeployDAO is Script {
         // Start broadcasting transactions
         vm.startBroadcast(deployerPrivateKey);
 
+        // Deploy NouncilDAOExecutor contract
+        NouncilDAOExecutor executor = new NouncilDAOExecutor(INITIAL_ADMIN_ADDRESS, DELAY);
+        console.log("NouncilDAOExecutor deployed at:", address(executor));
+
+
         // Deploy NouncilDAOLogic contract
         NouncilDAOLogic logic = new NouncilDAOLogic();
         console.log("NouncilDAOLogic deployed at:", address(logic));
 
-        // Deploy NouncilDAOExecutor contract
-        NouncilDAOExecutor executor = new NouncilDAOExecutor(INITIAL_ADMIN_ADDRESS, DELAY);
-        console.log("NouncilDAOExecutor deployed at:", address(executor));
 
         // Deploy NouncilDAOProxy contract
         NouncilDAOProxy proxy = new NouncilDAOProxy(

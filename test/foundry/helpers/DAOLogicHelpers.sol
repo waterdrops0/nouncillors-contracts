@@ -25,6 +25,7 @@ abstract contract DAOLogicHelpers is Test {
     address constant INITIAL_OWNER = address(0x5); 
     address nouncilDAO = address(0x6);
     address constant PROPOSER = address(0x7);
+    address constant ELIGIBLE_MINTER = 0xbE41e1Dd8C970AC40E8aB284CDd581e3b35Da51C;
 
     NouncilDAOProxy daoProxy;
     NouncilDAOLogic dao;
@@ -52,7 +53,8 @@ abstract contract DAOLogicHelpers is Test {
         vm.roll(block.number + 1);
     }
 
-    function mintWithProof(address to, bytes32[] calldata merkleProof) internal {
+    // Updated mintWithProof function to accept merkleProof as calldata
+    function mintWithProof(bytes32[] calldata merkleProof) internal {
         INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
             background: 0,
             body: 0,
@@ -61,7 +63,8 @@ abstract contract DAOLogicHelpers is Test {
             glasses: 0
         });
 
-        vm.startPrank(to);
+        // Using ELIGIBLE_MINTER and passing merkleProof as calldata
+        vm.startPrank(ELIGIBLE_MINTER);
         uint256 tokenId = nouncillorsToken.mintWithProof(merkleProof, seed);
         vm.stopPrank();
     }
