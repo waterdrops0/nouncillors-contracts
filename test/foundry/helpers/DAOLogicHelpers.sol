@@ -13,38 +13,35 @@ import { Utils } from './Utils.sol';
 
 abstract contract DAOLogicHelpers is Test {
     
-uint256 constant TIMELOCK_DELAY = 2 days;
-uint256 constant VOTING_PERIOD = 7_200; // 24 hours
-uint256 constant VOTING_DELAY = 1;
-uint256 constant PROPOSAL_THRESHOLD_BPS = 1;
-uint256 constant QUORUM_VOTES_BPS = 2000;
+    uint256 constant TIMELOCK_DELAY = 2 days;
+    uint256 constant VOTING_PERIOD = 7_200; // 24 hours
+    uint256 constant VOTING_DELAY = 1;
+    uint256 constant PROPOSAL_THRESHOLD_BPS = 1;
+    uint256 constant QUORUM_VOTES_BPS = 2000;
 
-// Predefined addresses
-address constant VETOER = address(0x3);
-address constant ADMIN = address(0x4);
-address constant INITIAL_OWNER = address(0x5); 
-address nouncilDAO = address(0x6);
-address constant PROPOSER = address(0x7);
+    // Predefined addresses
+    address constant VETOER = address(0x3);
+    address constant ADMIN = address(0x4);
+    address constant INITIAL_OWNER = address(0x5); 
+    address nouncilDAO = address(0x6);
+    address constant PROPOSER = address(0x7);
 
-NouncilDAOProxy daoProxy;
-NouncilDAOLogic dao;
-NouncillorsToken nouncillorsToken;
-NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(1), TIMELOCK_DELAY);
-
+    NouncilDAOProxy daoProxy;
+    NouncilDAOLogic dao;
+    NouncillorsToken nouncillorsToken;
+    NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(1), TIMELOCK_DELAY);
 
     function daoVersion() internal virtual returns (uint256) {
         return 0;
     }
 
-
     function mint(address to, uint256 amount) internal {
-
         INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
-        background: 0,
-        body: 0,
-        accessory: 0,
-        head: 0,
-        glasses: 0
+            background: 0,
+            body: 0,
+            accessory: 0,
+            head: 0,
+            glasses: 0
         });
 
         vm.startPrank(INITIAL_OWNER);
@@ -53,6 +50,20 @@ NouncilDAOExecutor timelock = new NouncilDAOExecutor(address(1), TIMELOCK_DELAY)
         }
         vm.stopPrank();
         vm.roll(block.number + 1);
+    }
+
+    function mintWithProof(address to, bytes32[] calldata merkleProof) internal {
+        INouncillorsToken.Seed memory seed = INouncillorsToken.Seed({
+            background: 0,
+            body: 0,
+            accessory: 0,
+            head: 0,
+            glasses: 0
+        });
+
+        vm.startPrank(to);
+        uint256 tokenId = nouncillorsToken.mintWithProof(merkleProof, seed);
+        vm.stopPrank();
     }
 
     function startVotingPeriod() internal {
