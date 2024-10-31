@@ -1,0 +1,54 @@
+// CreateProposal.s.sol
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "forge-std/Script.sol";
+import { NouncilDAOProxy } from "../contracts/governance/NouncilDAOProxy.sol";
+import { NounsTokenLike } from "../contracts/governance/NouncilDAOInterfaces.sol";
+
+contract CreateProposalScript is Script {
+    address public constant PROXY_ADDRESS = 0x8097173bCA40971642E3A780aAd420a45E8Cb610;
+    address public constant EXECUTOR_ADDRESS = 0xfc91fA66C06Ec6D086Da7C377e4403Fb51dB0474;
+    address public constant NOUNCIL_TOKEN_ADDRESS = /* Address of the Nouncil Token */;
+
+    function run() external {
+        uint256 proposerPrivateKey = vm.envUint("PRIVATE_KEY");
+        vm.startBroadcast(proposerPrivateKey);
+
+        NouncilDAOProxy proxy = NouncilDAOProxy(PROXY_ADDRESS);
+        NounsTokenLike nouncilToken = NounsTokenLike(NOUNCIL_TOKEN_ADDRESS);
+
+        // Ensure the proposer has enough voting power
+        uint256 votes = nouncilToken.getCurrentVotes(address(msg.sender));
+        console.log("Proposer's current votes:", votes);
+
+        // Proposal parameters
+        address;
+        targets[0] = EXECUTOR_ADDRESS;
+
+        uint256;
+        values[0] = 0;
+
+        string;
+        signatures[0] = "acceptAdmin()";
+
+        bytes;
+        calldatas[0] = "";
+
+        string memory description = "Proposal to accept admin rights on NouncilDAOExecutor.";
+
+        // Submit the proposal
+        uint256 proposalId = proxy.propose(
+            targets,
+            values,
+            signatures,
+            calldatas,
+            description
+        );
+
+        console.log("Proposal submitted with ID:", proposalId);
+
+        vm.stopBroadcast();
+    }
+}

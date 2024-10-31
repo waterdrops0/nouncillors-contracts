@@ -16,20 +16,23 @@ import { Utils } from './helpers/Utils.sol';
 contract NouncilDAOLogicState is Test, DeployUtils {
     
     address constant ELIGIBLE_MINTER = 0xbE41e1Dd8C970AC40E8aB284CDd581e3b35Da51C;
-    // Predefined Merkle Proof array
-    bytes32;
-    proof[0] = 0x4b278523b883e4b3d15629ad062f13fb62c1bc225781c30cca13861e9a5f480b;
-    proof[1] = 0x9b122a13601b95f977cb37e57f910f81aa61acb0cf6efac1055afc7251ed7972;
-    proof[2] = 0xf282b23d8264633a7a2a88788206209e6204dca7dc00b2d06d1ccc4cca0fb003;
-    proof[3] = 0xcf4945e90e80472a38b615d09e10e11e804c9280e670c4599a760a00599cbdc0;
-    proof[4] = 0x6e58cef1d0d83510de4741426a566e556ec4bfc26c4406d8129e197ef2f02896;
-    proof[5] = 0x7e407f3697933c7c3ff1022064d6bf08432578408b6b3f7b4ebf3f65abae80f3;
+    bytes32[] proof;  // Declare proof as a dynamic array
     Utils utils;
-    
+
 
     function setUp() public {
+
         // Initialize the Utils contract
         utils = new Utils();
+
+        // Initialize the proof array and add values
+        proof = new bytes32;
+        proof[0] = 0x4b278523b883e4b3d15629ad062f13fb62c1bc225781c30cca13861e9a5f480b;
+        proof[1] = 0x9b122a13601b95f977cb37e57f910f81aa61acb0cf6efac1055afc7251ed7972;
+        proof[2] = 0xf282b23d8264633a7a2a88788206209e6204dca7dc00b2d06d1ccc4cca0fb003;
+        proof[3] = 0xcf4945e90e80472a38b615d09e10e11e804c9280e670c4599a760a00599cbdc0;
+        proof[4] = 0x6e58cef1d0d83510de4741426a566e556ec4bfc26c4406d8129e197ef2f02896;
+        proof[5] = 0x7e407f3697933c7c3ff1022064d6bf08432578408b6b3f7b4ebf3f65abae80f3;
 
         NouncillorsDescriptor descriptor = _deployAndPopulateDescriptor();
 

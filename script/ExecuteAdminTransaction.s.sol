@@ -39,24 +39,6 @@ contract ExecuteAdminTransaction is Script {
         );
         console.log("Pending admin transaction executed successfully.");
 
-        // Step 2: Check if pendingAdmin is set correctly
-        (bool success, bytes memory returnData) = address(PROXY_ADDRESS).staticcall(
-            abi.encodeWithSignature("pendingAdmin()")
-        );
-
-        require(success, "Failed to retrieve pendingAdmin");
-        address pendingAdmin = abi.decode(returnData, (address));
-        console.log("Pending Admin set to:", pendingAdmin);
-
-        // Verify if pendingAdmin is correctly set to PROXY_ADDRESS
-        require(pendingAdmin == PROXY_ADDRESS, "pendingAdmin was not set correctly.");
-
-        // Step 3: Accept admin role
-        (bool successAccept, ) = address(PROXY_ADDRESS).call(abi.encodeWithSignature("_acceptAdmin()"));
-        require(successAccept, "NouncilDAOProxy failed to accept the admin role.");
-
-        console.log("NouncilDAOProxy has accepted the admin role of NouncilDAOExecutor.");
-
         vm.stopBroadcast();
     }
 }
